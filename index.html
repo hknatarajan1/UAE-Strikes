@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UAE — Iranian Strike Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root {
+  --ake1:#00549f; --ake2:#083863; --ake3:#11125d;
+  --red:#ef4444; --amber:#f59e0b; --green:#22c55e; --blue:#3b82f6;
+  --drone:#d97706; --missile:#dc2626; --debris:#7c3aed; --mixed:#0891b2;
+  --bg:#e8eef4;
+  --panel:rgba(255,255,255,0.97);
+  --panel-dark:rgba(6,30,54,0.97);
+  --border:rgba(8,56,99,0.14);
+  --border-dark:rgba(255,255,255,0.09);
+  --text:#1a2a3a; --text-dark:#dde8f2;
+  --muted:#6b8ba8; --muted2:#4a6a88;
+  --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  --hdr:46px; --datefil:38px; --sbar:28px; --sb-w:284px;
+}
+
+/* ── dark mode toggle ── */
+body.dark-map {
+  --bg:#061c30; --panel:rgba(6,30,54,0.97); --border:rgba(255,255,255,0.09);
+  --text:#dde8f2; --muted:#4d6e8e; --muted2:#7a9ab8;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:var(--font);background:var(--bg);color:var(--text);}
+#map{position:absolute;inset:0;z-index:1;}
+
+/* ── LEAFLET ── */
+.leaflet-popup-content-wrapper{
+  background:var(--panel)!important; border:1px solid var(--border)!important;
+  border-radius:12px!important; box-shadow:0 20px 60px rgba(0,0,0,0.25)!important;
+  color:var(--text)!important; font-family:var(--font)!important;
+  padding:0!important; overflow:hidden!important;
+}
+body.dark-map .leaflet-popup-content-wrapper{
+  box-shadow:0 28px 80px rgba(0,0,0,0.88)!important;
+}
+.leaflet-popup-content{margin:0!important;width:420px!important;max-height:520px!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;}
+/* sticky header inside popup */
+.pu-hdr{flex-shrink:0;padding:14px 16px 11px;border-bottom:1px solid var(--border);}
+.pu-body{flex:1;overflow-y:auto;min-height:0;}
+.pu-body::-webkit-scrollbar{width:3px;}
+.pu-body::-webkit-scrollbar-thumb{background:rgba(0,84,159,.35);border-radius:2px;}
+.leaflet-popup-tip-container{display:none!important;}
+.leaflet-popup-close-button{color:var(--muted)!important;font-size:20px!important;right:12px!important;top:12px!important;z-index:10!important;line-height:1!important;}
+.leaflet-popup-close-button:hover{color:var(--text)!important;}
+.leaflet-control-attribution{font-size:9px!important;background:rgba(255,255,255,0.75)!important;color:#888!important;}
+body.dark-map .leaflet-control-attribution{background:rgba(0,0,0,0.6)!important;color:#555!important;}
+.leaflet-control-attribution a{color:#666!important;}
+/* layer control removed */
+.leaflet-bar a{background:var(--panel)!important;color:var(--muted2)!important;border-color:var(--border)!important;}
+.leaflet-bar a:hover{background:var(--ake1)!important;color:#fff!important;}
+
+/* ══════════════════════════════════════
+   HEADER — title + stats in one row
+   ══════════════════════════════════════ */
+#hdr{
+  position:absolute;top:0;left:0;right:0;height:var(--hdr);
+  background:var(--ake2);border-bottom:2px solid var(--ake1);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:1000;
+  box-shadow:0 2px 16px rgba(0,0,0,0.35);
+}
+.h-left{display:flex;align-items:center;gap:10px;}
+.h-title{font-size:13px;font-weight:700;letter-spacing:-0.01em;color:#fff;white-space:nowrap;}
+.h-sub{font-size:9px;color:rgba(255,255,255,0.5);margin-top:1px;white-space:nowrap;}
+.live-pill{
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
+  background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.35);
+  border-radius:20px;padding:3px 9px;font-size:8px;font-weight:700;
+  letter-spacing:.12em;color:#f87171;text-transform:uppercase;
+}
+.ldot{width:5px;height:5px;background:#f87171;border-radius:50%;animation:blink 1.2s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.h-right{display:flex;align-items:center;gap:6px;}
+.stat-chip{
+  display:flex;flex-direction:column;align-items:center;
+  background:rgba(0,84,159,0.35);border:1px solid rgba(255,255,255,0.12);
+  border-radius:6px;padding:3px 10px;min-width:70px;
+}
+.sc-val{font-size:14px;font-weight:700;line-height:1;font-family:var(--mono);color:#fff;}
+.sc-val.r{color:#fca5a5;}
+.sc-val.a{color:#fcd34d;}
+.sc-val.g{color:#86efac;}
+.sc-lbl{font-size:7px;color:rgba(255,255,255,0.45);margin-top:2px;letter-spacing:.08em;text-transform:uppercase;}
+.map-style-group{display:flex;align-items:center;gap:0;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);border-radius:6px;overflow:hidden;}
+.msb{
+  padding:4px 10px;font-size:9px;font-weight:600;cursor:pointer;
+  color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.05);
+  border:none;border-right:1px solid rgba(255,255,255,0.1);
+  font-family:var(--font);transition:all .12s;white-space:nowrap;
+}
+.msb:last-child{border-right:none;}
+.msb:hover{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.9);}
+.msb.active{background:var(--ake1);color:#fff;}
+#hts{font-family:var(--mono);font-size:9px;color:rgba(255,255,255,0.4);min-width:68px;text-align:right;flex-shrink:0;}
+
+/* ══════════════════════════════════════
+   DATE FILTER BAR — horizontal strip below header
+   ══════════════════════════════════════ */
+#date-bar{
+  position:absolute;top:var(--hdr);left:0;right:0;height:var(--datefil);
+  background:var(--ake2);border-bottom:1px solid rgba(0,0,0,0.15);
+  display:flex;align-items:center;gap:4px;padding:0 12px;
+  z-index:999;overflow-x:auto;
+  /* hide scrollbar but allow scroll */
+  scrollbar-width:none;
+}
+#date-bar::-webkit-scrollbar{display:none;}
+
+.dbar-btn{
+  flex-shrink:0;padding:4px 11px;border-radius:4px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.12);
+  font-size:9px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);background:rgba(255,255,255,0.05);
+  transition:all .12s;font-family:var(--mono);white-space:nowrap;
+}
+.dbar-btn:hover{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);}
+/* (active states defined below with glow) */
+
+/* thin scroll hint — right fade on date bar */
+.dbar-fade-r{
+  position:absolute;right:0;top:var(--hdr);height:var(--datefil);
+  width:36px;background:linear-gradient(to right,transparent,var(--ake2));
+  z-index:1000;pointer-events:none;
+}
+/* Active date badge glow */
+.dbar-btn.active{
+  background:rgba(239,68,68,0.22);border-color:rgba(239,68,68,0.5);
+  color:#fca5a5;box-shadow:0 0 8px rgba(239,68,68,0.2);
+}
+.dbar-btn.all.active{
+  background:rgba(0,84,159,0.4);border-color:rgba(96,165,250,0.5);
+  color:#93c5fd;box-shadow:0 0 8px rgba(0,84,159,0.25);
+}
+
+/* ══════════════════════════════════════
+   SIDEBAR
+   ══════════════════════════════════════ */
+#sb{
+  position:absolute;
+  top:calc(var(--hdr) + var(--datefil));
+  left:0;bottom:var(--sbar);
+  width:var(--sb-w);
+  background:var(--panel);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;z-index:500;overflow:hidden;
+}
+.sec-label{font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+
+/* Stats grid */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);flex-shrink:0;}
+.sg-cell{padding:9px 12px;border-right:1px solid var(--border);}
+.sg-cell:nth-child(even){border-right:none;}
+.sg-cell:nth-child(n+3){border-top:1px solid var(--border);}
+.sg-val{font-size:18px;font-weight:700;line-height:1;font-family:var(--mono);}
+.sg-val.r{color:var(--missile);}
+.sg-val.a{color:var(--drone);}
+.sg-val.g{color:#16a34a;}
+.sg-val.b{color:var(--ake1);}
+.sg-lbl{font-size:8px;color:var(--muted);margin-top:3px;letter-spacing:.07em;text-transform:uppercase;}
+.sg-sub{font-size:7.5px;color:var(--muted);margin-top:2px;font-family:var(--mono);opacity:.75;}
+.sg-sub-row{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;}
+.sg-sub-chip{font-size:7.5px;font-family:var(--mono);font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap;}
+.sg-sub-chip.g{background:rgba(22,163,74,.1);color:#16a34a;border:1px solid rgba(22,163,74,.2);}
+.sg-sub-chip.r{background:rgba(220,38,38,.1);color:var(--missile);border:1px solid rgba(220,38,38,.2);}
+body.dark-map .sg-sub-chip.g{background:rgba(74,222,128,.1);color:#4ade80;border-color:rgba(74,222,128,.2);}
+body.dark-map .sg-val.g{color:#4ade80;}
+
+/* Type filter */
+.filter-row{display:flex;gap:4px;padding:8px 11px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ftab{
+  flex:1;padding:5px 2px;border-radius:5px;
+  background:rgba(0,84,159,0.04);border:1px solid var(--border);
+  font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  cursor:pointer;text-align:center;transition:all .12s;color:var(--muted);
+}
+.ftab:hover{background:rgba(0,84,159,0.1);color:var(--text);}
+.ftab.on.all    {background:rgba(0,84,159,.14);border-color:rgba(0,84,159,.4);color:var(--ake1);}
+.ftab.on.drone  {background:rgba(217,119,6,.12);border-color:rgba(217,119,6,.4);color:var(--drone);}
+.ftab.on.missile{background:rgba(220,38,38,.12);border-color:rgba(220,38,38,.4);color:var(--missile);}
+.ftab.on.debris {background:rgba(124,58,237,.1);border-color:rgba(124,58,237,.35);color:var(--debris);}
+
+/* Incident list header */
+.list-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 12px 5px;border-bottom:1px solid var(--border);flex-shrink:0;
+}
+.list-hdr-lbl{font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+/* Scroll hint pill */
+.scroll-hint{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(0,84,159,0.1);border:1px solid rgba(0,84,159,0.2);
+  border-radius:20px;padding:2px 8px;
+  font-size:8px;font-weight:600;color:var(--ake1);font-family:var(--mono);
+  letter-spacing:.04em;
+}
+body.dark-map .scroll-hint{background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.2);color:#93c5fd;}
+.scroll-arrow{display:inline-block;animation:bounceY 1.2s ease-in-out infinite;}
+@keyframes bounceY{0%,100%{transform:translateY(0)}55%{transform:translateY(3px)}}
+
+/* Scroll container wrapper — for fade overlay */
+.alist-wrap{flex:1;position:relative;overflow:hidden;display:flex;flex-direction:column;}
+/* Fade-out at bottom signals more content */
+.alist-wrap::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:40px;
+  background:linear-gradient(to bottom,transparent,var(--panel));
+  pointer-events:none;z-index:2;
+  transition:opacity .2s;
+}
+body.dark-map .alist-wrap::after{background:linear-gradient(to bottom,transparent,rgba(6,30,54,0.97));}
+
+/* Scroll container — VISIBLE scrollbar as scroll cue */
+#alist{flex:1;overflow-y:scroll;padding:5px 7px 30px;}
+#alist::-webkit-scrollbar{width:4px;}
+#alist::-webkit-scrollbar-track{background:rgba(0,84,159,0.05);border-radius:2px;}
+#alist::-webkit-scrollbar-thumb{background:rgba(0,84,159,0.3);border-radius:2px;}
+#alist::-webkit-scrollbar-thumb:hover{background:rgba(0,84,159,0.55);}
+body.dark-map #alist::-webkit-scrollbar-thumb{background:rgba(96,165,250,0.35);}
+
+/* Incident rows */
+.ap-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 9px;border-radius:7px;cursor:pointer;
+  border:1px solid transparent;margin-bottom:2px;transition:all .12s;
+}
+.ap-row:hover{background:rgba(0,84,159,0.07);border-color:var(--border);}
+.ap-row.on{background:rgba(0,84,159,0.12);border-color:rgba(0,84,159,0.3);}
+body.dark-map .ap-row:hover{background:rgba(0,84,159,0.18);}
+body.dark-map .ap-row.on{background:rgba(0,84,159,0.28);border-color:rgba(0,84,159,0.5);}
+
+/* Colour pips */
+.ap-pip{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ap-pip.drone  {background:var(--drone); box-shadow:0 0 6px rgba(217,119,6,.6);}
+.ap-pip.missile{background:var(--missile);box-shadow:0 0 6px rgba(220,38,38,.6);}
+.ap-pip.debris {background:var(--debris);box-shadow:0 0 6px rgba(124,58,237,.55);}
+.ap-pip.mixed  {background:var(--mixed); box-shadow:0 0 6px rgba(8,145,178,.55);}
+.ap-info{flex:1;min-width:0;}
+.ap-name{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);}
+.ap-city{font-size:9px;color:var(--muted);margin-top:1px;}
+.ap-meta2{font-size:8px;color:var(--muted2);margin-top:1px;font-family:var(--mono);}
+.ap-badge2{font-size:7px;padding:2px 5px;border-radius:3px;font-weight:700;letter-spacing:.05em;flex-shrink:0;font-family:var(--mono);text-transform:uppercase;}
+.ap-badge2.drone  {background:rgba(217,119,6,.12);color:var(--drone);border:1px solid rgba(217,119,6,.2);}
+.ap-badge2.missile{background:rgba(220,38,38,.12);color:var(--missile);border:1px solid rgba(220,38,38,.2);}
+.ap-badge2.debris {background:rgba(124,58,237,.1);color:var(--debris);border:1px solid rgba(124,58,237,.18);}
+.ap-badge2.mixed  {background:rgba(8,145,178,.1);color:var(--mixed);border:1px solid rgba(8,145,178,.18);}
+
+/* ══════════════════════════════════════
+   LEGEND — bottom right, professional SVG icons
+   ══════════════════════════════════════ */
+#legend{
+  position:absolute;
+  bottom:calc(var(--sbar) + 10px);
+  right:10px;
+  z-index:600;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;
+  backdrop-filter:blur(14px);min-width:172px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.14);
+}
+body.dark-map #legend{box-shadow:0 6px 32px rgba(0,0,0,0.55);}
+.leg-title{
+  font-size:8px;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);
+  margin-bottom:9px;padding-bottom:7px;
+  border-bottom:1px solid var(--border);
+}
+.leg-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.leg-row:last-child{margin-bottom:0;}
+/* SVG icon in a coloured pill */
+.leg-icon{
+  width:28px;height:28px;border-radius:7px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.leg-icon.drone  {background:rgba(217,119,6,.12);}
+.leg-icon.missile{background:rgba(220,38,38,.12);}
+.leg-icon.debris {background:rgba(124,58,237,.1);}
+.leg-icon.mixed  {background:rgba(8,145,178,.1);}
+.leg-icon svg{display:block;}
+.leg-text{flex:1;}
+.leg-lbl{font-size:10px;font-weight:600;color:var(--text);line-height:1.2;}
+.leg-sub{font-size:8px;color:var(--muted);margin-top:1px;}
+
+/* ══════════════════════════════════════
+   MARKERS
+   ══════════════════════════════════════ */
+.mi{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+.mc{
+  width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(255,255,255,.3);
+  transition:transform .12s;position:relative;
+}
+.mi:hover .mc{transform:scale(1.3);}
+.mc.drone  {background:var(--drone); box-shadow:0 0 14px rgba(217,119,6,.7),0 2px 6px rgba(0,0,0,.4);}
+.mc.missile{background:var(--missile);box-shadow:0 0 14px rgba(220,38,38,.7),0 2px 6px rgba(0,0,0,.4);}
+.mc.debris {background:var(--debris);box-shadow:0 0 12px rgba(124,58,237,.65),0 2px 6px rgba(0,0,0,.4);}
+.mc.mixed  {background:var(--mixed); box-shadow:0 0 12px rgba(8,145,178,.6),0 2px 6px rgba(0,0,0,.4);}
+.mc-count{
+  position:absolute;top:-5px;right:-7px;
+  background:#dc2626;color:#fff;
+  font-family:var(--mono);font-size:8px;font-weight:700;
+  border-radius:9px;padding:0 4px;min-width:14px;text-align:center;
+  border:1.5px solid rgba(255,255,255,.5);
+  box-shadow:0 1px 4px rgba(0,0,0,.6);
+  line-height:14px;height:14px;
+}
+.ml{
+  font-family:var(--mono);font-size:9px;font-weight:700;color:#fff;
+  text-shadow:0 1px 4px rgba(0,0,0,.98),0 0 10px rgba(0,0,0,.85);
+  white-space:nowrap;
+}
+
+/* ══════════════════════════════════════
+   STATUS BAR
+   ══════════════════════════════════════ */
+#sbar{
+  position:absolute;bottom:0;left:0;right:0;height:var(--sbar);
+  background:var(--ake3);border-top:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:500;font-size:9px;color:rgba(255,255,255,0.35);
+}
+.prog-wrap{width:80px;height:2px;background:rgba(255,255,255,.08);border-radius:1px;}
+.prog-fill{height:100%;background:var(--ake1);border-radius:1px;transition:width 1s linear;}
+#rfbtn{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+  color:rgba(255,255,255,.4);padding:3px 10px;border-radius:5px;
+  font-family:var(--font);font-size:9px;cursor:pointer;transition:all .15s;
+}
+#rfbtn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8);}
+#rfbtn.spin svg{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.sbar-link{
+  color:rgba(255,255,255,0.5);font-size:9px;text-decoration:none;
+  padding:2px 6px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);
+  transition:all .13s;font-family:var(--font);
+}
+.sbar-link:hover{color:#fff;background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);}
+
+/* ══════════════════════════════════════
+   POPUP
+   ══════════════════════════════════════ */
+.pu-hdr{padding:15px 17px 11px;border-bottom:1px solid var(--border);}
+.pu-hdr.drone  {border-top:3px solid var(--drone);}
+.pu-hdr.missile{border-top:3px solid var(--missile);}
+.pu-hdr.debris {border-top:3px solid var(--debris);}
+.pu-hdr.mixed  {border-top:3px solid var(--mixed);}
+.pu-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.pu-icon-wrap{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pu-icon-wrap.drone  {background:rgba(217,119,6,.15);}
+.pu-icon-wrap.missile{background:rgba(220,38,38,.15);}
+.pu-icon-wrap.debris {background:rgba(124,58,237,.12);}
+.pu-icon-wrap.mixed  {background:rgba(8,145,178,.1);}
+.pu-meta{flex:1;}
+.pu-badges{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap;}
+.pu-tbadge{font-size:8px;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:.07em;font-family:var(--mono);text-transform:uppercase;}
+.pu-tbadge.drone  {background:rgba(217,119,6,.12);color:var(--drone);border:1px solid rgba(217,119,6,.25);}
+.pu-tbadge.missile{background:rgba(220,38,38,.12);color:var(--missile);border:1px solid rgba(220,38,38,.25);}
+.pu-tbadge.debris {background:rgba(124,58,237,.1);color:var(--debris);border:1px solid rgba(124,58,237,.22);}
+.pu-tbadge.mixed  {background:rgba(8,145,178,.1);color:var(--mixed);border:1px solid rgba(8,145,178,.2);}
+.pu-sbadge{font-size:8px;padding:2px 8px;border-radius:4px;font-weight:700;letter-spacing:.07em;font-family:var(--mono);text-transform:uppercase;}
+.pu-sbadge.r{background:rgba(220,38,38,.12);color:var(--missile);border:1px solid rgba(220,38,38,.22);}
+.pu-sbadge.a{background:rgba(217,119,6,.12);color:var(--drone);border:1px solid rgba(217,119,6,.22);}
+.pu-sbadge.p{background:rgba(124,58,237,.1);color:var(--debris);border:1px solid rgba(124,58,237,.2);}
+.pu-name{font-size:14px;font-weight:700;margin-top:4px;color:var(--text);}
+.pu-city{font-size:10px;color:var(--muted);margin-top:2px;}
+.pu-dt{font-size:9px;color:var(--muted);margin-top:3px;font-family:var(--mono);}
+.pu-grid{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);}
+.pu-cell{padding:9px 14px;border-right:1px solid var(--border);}
+.pu-cell:nth-child(even){border-right:none;}
+.pu-cell:nth-child(n+3){border-top:1px solid var(--border);}
+.pu-cell-k{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.pu-cell-v{font-size:11px;font-weight:600;line-height:1.35;color:var(--text);}
+.pu-cell-v.r{color:var(--missile);}
+.pu-cell-v.a{color:var(--drone);}
+.pu-cell-v.g{color:#16a34a;}
+body.dark-map .pu-cell-v.g{color:#4ade80;}
+.pu-desc{padding:11px 16px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted2);line-height:1.65;}
+.pu-news{padding:12px 16px;border-bottom:1px solid var(--border);}
+.pu-news-title{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
+.news-item{display:flex;gap:9px;margin-bottom:10px;}
+.news-item:last-child{margin-bottom:0;}
+.news-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.news-dot.r{background:var(--red);}
+.news-dot.a{background:var(--amber);}
+.news-dot.g{background:var(--green);}
+.news-dot.b{background:var(--blue);}
+.news-body{flex:1;}
+.news-text{font-size:11px;color:var(--text);line-height:1.5;}
+.news-meta{font-size:9px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.pu-foot{padding:7px 16px;display:flex;justify-content:space-between;font-size:9px;color:var(--muted);font-family:var(--mono);}
+/* Source links */
+.pu-links{padding:10px 16px 12px;border-top:1px solid var(--border);}
+.pu-links-title{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.pu-link-row{display:flex;flex-wrap:wrap;gap:5px;}
+.pu-link{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:10px;font-weight:500;color:var(--ake1);
+  background:rgba(0,84,159,0.08);border:1px solid rgba(0,84,159,0.2);
+  border-radius:5px;padding:4px 9px;text-decoration:none;
+  transition:all .13s;
+}
+.pu-link:hover{background:rgba(0,84,159,0.18);border-color:rgba(0,84,159,0.4);color:var(--ake1);}
+body.dark-map .pu-link{background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.25);color:#93c5fd;}
+body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
+.pu-link-icon{font-size:9px;opacity:.7;}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<div id="hdr">
+  <div class="h-left">
+    <div>
+      <div class="h-title">UAE — Iranian Strike Intelligence</div>
+      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">07 Mar 2026</span></div>
+    </div>
+    <div class="live-pill"><div class="ldot"></div>Live</div>
+  </div>
+  <div class="h-right">
+    <div class="stat-chip"><span class="sc-val"  id="tot-launched">—</span><span class="sc-lbl">Total Launched</span></div>
+    <div class="stat-chip"><span class="sc-val r" id="tot-missiles">—</span><span class="sc-lbl">Missiles</span></div>
+    <div class="stat-chip"><span class="sc-val a" id="tot-drones">—</span><span class="sc-lbl">Drones</span></div>
+    <div class="stat-chip"><span class="sc-val r" id="tot-struck">—</span><span class="sc-lbl">Struck</span></div>
+    <div class="stat-chip"><span class="sc-val g" id="tot-int">—</span><span class="sc-lbl">Intercept %</span></div>
+    <div class="map-style-group">
+      <button class="msb"        id="msb-light"  onclick="setMapStyle('light')">☀ Light</button>
+      <button class="msb active" id="msb-dark"   onclick="setMapStyle('dark')">🌑 Dark</button>
+      <button class="msb"        id="msb-street" onclick="setMapStyle('street')">🗺 Street</button>
+    </div>
+    <span id="hts">—</span>
+  </div>
+</div>
+
+<!-- ══ DATE FILTER BAR — horizontal strip, easy to extend ══ -->
+<!--
+  ╔══════════════════════════════════════════════════════════╗
+  ║  TO ADD A NEW DATE: copy one .dbar-btn line below and   ║
+  ║  add the day key to DAILY_STATS + push incidents.       ║
+  ║  Days auto-render from the JS DAYS array.               ║
+  ╚══════════════════════════════════════════════════════════╝
+-->
+<div id="date-bar"></div>
+<div class="dbar-fade-r"></div>
+
+<!-- ══ SIDEBAR ══ -->
+<div id="sb">
+
+  <!-- Stats tiles -->
+  <div class="stats-grid">
+    <div class="sg-cell">
+      <div class="sg-val r" id="sg-m">—</div>
+      <div class="sg-lbl">Missiles fired</div>
+      <div class="sg-sub-row">
+        <span class="sg-sub-chip g" id="sg-mi">— intercept.</span>
+        <span class="sg-sub-chip r" id="sg-ms">— struck</span>
+      </div>
+    </div>
+    <div class="sg-cell">
+      <div class="sg-val a" id="sg-d">—</div>
+      <div class="sg-lbl">Drones fired</div>
+      <div class="sg-sub-row">
+        <span class="sg-sub-chip g" id="sg-di">— intercept.</span>
+        <span class="sg-sub-chip r" id="sg-ds">— struck</span>
+      </div>
+    </div>
+    <div class="sg-cell">
+      <div class="sg-val g" id="sg-r">—</div>
+      <div class="sg-lbl">Overall intercept</div>
+      <div class="sg-sub" id="sg-rs">—</div>
+    </div>
+    <div class="sg-cell">
+      <div class="sg-val b" id="sg-i">—</div>
+      <div class="sg-lbl">UAE Incidents</div>
+      <div class="sg-sub" id="sg-is">confirmed</div>
+    </div>
+  </div>
+
+  <!-- Type filter -->
+  <div class="filter-row">
+    <div class="ftab on all"  onclick="setTF(this,'all')">All</div>
+    <div class="ftab drone"   onclick="setTF(this,'drone')">Drone</div>
+    <div class="ftab missile" onclick="setTF(this,'missile')">Missile</div>
+    <div class="ftab debris"  onclick="setTF(this,'debris')">Debris</div>
+  </div>
+
+  <!-- Incident list -->
+  <div class="list-hdr">
+    <span class="list-hdr-lbl">⚡ Incidents — latest first</span>
+    <span class="scroll-hint"><span class="scroll-arrow">↓</span> scroll</span>
+  </div>
+  <div class="alist-wrap">
+    <div id="alist"></div>
+  </div>
+</div>
+
+<!-- ══ LEGEND — bottom right, professional SVG icons ══ -->
+<div id="legend">
+  <div class="leg-title">Incident Classification</div>
+
+  <div class="leg-row">
+    <div class="leg-icon drone">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="8" stroke="#d97706" stroke-width="1.5"/>
+        <circle cx="10" cy="10" r="3.5" stroke="#d97706" stroke-width="1.5"/>
+        <circle cx="10" cy="10" r="1.2" fill="#d97706"/>
+        <line x1="10" y1="1" x2="10" y2="4" stroke="#d97706" stroke-width="1.3"/>
+        <line x1="10" y1="16" x2="10" y2="19" stroke="#d97706" stroke-width="1.3"/>
+        <line x1="1" y1="10" x2="4" y2="10" stroke="#d97706" stroke-width="1.3"/>
+        <line x1="16" y1="10" x2="19" y2="10" stroke="#d97706" stroke-width="1.3"/>
+      </svg>
+    </div>
+    <div class="leg-text">
+      <div class="leg-lbl">Drone strike</div>
+      <div class="leg-sub">Shahed / loitering munition</div>
+    </div>
+  </div>
+
+  <div class="leg-row">
+    <div class="leg-icon missile">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2 L13 8 L11.2 8 L11.2 17 L8.8 17 L8.8 8 L7 8 Z" fill="#dc2626"/>
+        <path d="M8.8 13.5 L5.5 17.5 L8.8 16Z" fill="#dc2626"/>
+        <path d="M11.2 13.5 L14.5 17.5 L11.2 16Z" fill="#dc2626"/>
+        <circle cx="10" cy="3" r="1.3" fill="#dc2626"/>
+      </svg>
+    </div>
+    <div class="leg-text">
+      <div class="leg-lbl">Ballistic missile</div>
+      <div class="leg-sub">Fattah / Emad / Shahab type</div>
+    </div>
+  </div>
+
+  <div class="leg-row">
+    <div class="leg-icon debris">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+        <circle cx="10" cy="10" r="2.5" fill="#7c3aed"/>
+        <line x1="10" y1="2" x2="10" y2="5.5" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="10" y1="14.5" x2="10" y2="18" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="2" y1="10" x2="5.5" y2="10" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="14.5" y1="10" x2="18" y2="10" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="4" y1="4" x2="6.5" y2="6.5" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="13.5" y1="13.5" x2="16" y2="16" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="16" y1="4" x2="13.5" y2="6.5" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="4" y1="16" x2="6.5" y2="13.5" stroke="#7c3aed" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="leg-text">
+      <div class="leg-lbl">Interception debris</div>
+      <div class="leg-sub">Fragments from intercepts</div>
+    </div>
+  </div>
+
+  <div class="leg-row">
+    <div class="leg-icon mixed">
+      <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+        <path d="M10 2.5 L18 17 L2 17 Z" stroke="#0891b2" stroke-width="1.5" stroke-linejoin="round" fill="rgba(8,145,178,0.12)"/>
+        <line x1="10" y1="8" x2="10" y2="12.5" stroke="#0891b2" stroke-width="1.8" stroke-linecap="round"/>
+        <circle cx="10" cy="14.5" r="1" fill="#0891b2"/>
+      </svg>
+    </div>
+    <div class="leg-text">
+      <div class="leg-lbl">Mixed / unconfirmed</div>
+      <div class="leg-sub">Multiple or unclear type</div>
+    </div>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<!-- ══ STATUS BAR ══ -->
+<div id="sbar">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <div class="prog-wrap"><div class="prog-fill" id="pf" style="width:100%"></div></div>
+    <span id="pcd" style="font-size:9px;font-family:var(--mono);">60s</span>
+    <button id="rfbtn" onclick="manualRefresh()">
+      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+      </svg> Refresh
+    </button>
+  </div>
+  <span style="color:rgba(255,255,255,0.4);">Gulf Standard Time UTC+4</span>
+  <span style="display:flex;align-items:center;gap:4px;"><span style="color:rgba(255,255,255,0.3);font-size:8px;letter-spacing:.06em;text-transform:uppercase;margin-right:4px;">Sources ↗</span><a href="https://www.mod.gov.ae" target="_blank" class="sbar-link">UAE MOD</a><a href="https://www.dmo.gov.ae" target="_blank" class="sbar-link">Dubai Media Office</a><a href="https://apnews.com/hub/united-arab-emirates" target="_blank" class="sbar-link">AP</a><a href="https://www.reuters.com/world/middle-east/" target="_blank" class="sbar-link">Reuters</a><a href="https://www.longwarjournal.org" target="_blank" class="sbar-link">Long War Journal</a></span>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  CONFIGURATION — update here each day                          ║
+// ║  1. Add a new entry to DAYS array (key + label)               ║
+// ║  2. Add matching entry to DAILY_STATS                         ║
+// ║  3. Push new incidents to INCIDENTS                           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+
+// ── Day keys in chronological order (oldest last for date-bar display) ──
+// The date bar renders these left to right as: All | 28 Feb | 01 Mar | ...
+const DAYS = [
+  { k:'all',   l:'All' },
+  { k:'28feb', l:'28 Feb' },
+  { k:'01mar', l:'01 Mar' },
+  { k:'02mar', l:'02 Mar' },
+  { k:'03mar', l:'03 Mar' },
+  { k:'04mar', l:'04 Mar' },
+  { k:'05mar', l:'05 Mar' },
+  { k:'06mar', l:'06 Mar' },
+  { k:'07mar', l:'07 Mar' },
+  // ← ADD NEW DAYS HERE: { k:'08mar', l:'08 Mar' },
+];
+
+// ── Daily UAE-wide statistics (UAE MOD official briefings) ──
+const DAILY = {
+  all:    { label:'All Days', ml:196, dl:1072, mi:181, di:1001, ms:2,  ds:71, inc:25 },
+  '28feb':{ label:'28 Feb',   ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
+  '01mar':{ label:'01 Mar',   ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
+  '02mar':{ label:'02 Mar',   ml:9,   dl:148,  mi:9,   di:143,  ms:0,  ds:5,  inc:2  },
+  '03mar':{ label:'03 Mar',   ml:1,   dl:137,  mi:1,   di:133,  ms:0,  ds:4,  inc:3  },
+  '04mar':{ label:'04 Mar',   ml:3,   dl:129,  mi:3,   di:121,  ms:0,  ds:8,  inc:1  },
+  '05mar':{ label:'05 Mar',   ml:7,   dl:131,  mi:6,   di:125,  ms:1,  ds:6,  inc:4  },
+  '06mar':{ label:'06 Mar',   ml:2,   dl:55,   mi:2,   di:52,   ms:0,  ds:3,  inc:2  },
+  '07mar':{ label:'07 Mar',   ml:16,  dl:122,  mi:16,  di:117,  ms:0,  ds:5,  inc:5  },
+  // '08mar':{ label:'08 Mar',   ml:0,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:0  },
+};
+
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  INCIDENTS — all UAE, latest first                              ║
+// ║  mwave/dwave = total fired that day (UAE-wide)                  ║
+// ║  mstruck/dstruck = that struck UAE territory that day           ║
+// ╚══════════════════════════════════════════════════════════════════╝
+const INCIDENTS = [
+
+  // ══ 07 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'BARSHA', name:'Al Barsha — Driver Killed', area:'Al Barsha', emirate:'Dubai',
+    lat:25.1085, lon:55.1990, type:'debris', day:'07mar', time:'~08:30 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Interception debris (drone)', cas:'1 killed (Asian national)', dmg:'Vehicle destroyed',
+    mwave:16, dwave:122, mstruck:0, dstruck:5, rate:'96%',
+    desc:'Debris from the interception of an Iranian drone struck a vehicle in Al Barsha, killing the driver — an Asian national. The fourth UAE fatality since 28 February. UAE authorities confirmed falling interception debris was the cause, not a direct strike. 16 ballistic missiles and 122 drones were launched on 7 March; all 16 missiles intercepted, 5 drones reached UAE territory.',
+    news:[
+      {dot:'r',text:'Interception debris falls on vehicle in Al Barsha. Asian driver killed — 4th UAE fatality.',time:'07 Mar · 08:30'},
+      {dot:'a',text:'Dubai Media Office confirms. Area secured by police.',time:'07 Mar · 09:00'},
+      {dot:'b',text:'UAE death toll now 4: Pakistani, Nepalese, Bangladeshi, Asian nationals.',time:'07 Mar · 10:00'},
+    ],
+    links:[
+      {label:'Dubai Media Office', url:'https://www.dmo.gov.ae/en/MediaCenter/News'},
+      {label:'UAE MOD Statement', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'Reuters: UAE fatalities', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'MARINA23', name:'23 Marina Tower', area:'Dubai Marina', emirate:'Dubai',
+    lat:25.0797, lon:55.1418, type:'drone', day:'07mar', time:'~08:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Iranian drone (Shahed-136 type)', cas:'None at tower; 1 killed nearby by debris', dmg:'Exterior damage; fire on upper floors',
+    mwave:16, dwave:122, mstruck:0, dstruck:5, rate:'96%',
+    desc:'An Iranian drone struck the 93-storey 23 Marina tower (395m) in Dubai Marina, one of the world\'s tallest residential buildings. Iranian media claimed the target was Israeli security and command facilities housed in the tower. Black smoke was visible from across the waterfront. Debris from the engagement separately killed a driver in Al Barsha.',
+    news:[
+      {dot:'r',text:'Iranian drone strikes 23 Marina tower. Black smoke across Dubai Marina.',time:'07 Mar · 08:00'},
+      {dot:'r',text:'Iranian media: target was alleged Israeli security/command facilities inside tower.',time:'07 Mar · 08:15'},
+      {dot:'a',text:'UAE MOD: "Debris from a successful interception caused damage on exterior of a tower in Dubai Marina."',time:'07 Mar · 09:00'},
+      {dot:'b',text:'Israeli FM advises remaining ~4,000 Israelis in UAE to depart via overland route to Oman.',time:'07 Mar · 10:30'},
+    ],
+    links:[
+      {label:'AP: 23 Marina strike', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'BBC: Dubai under attack', url:'https://www.bbc.com/news/topics/c77jz3mdmget/iran-attacks-uae'},
+      {label:'Flightradar24 data', url:'https://www.flightradar24.com/blog'},
+    ]
+  },
+  {
+    id:'DXB7', name:'Dubai Airport — Brief Closure', area:'Al Garhoud', emirate:'Dubai',
+    lat:25.2580, lon:55.3690, type:'debris', day:'07mar', time:'~09:00 GST',
+    status:'DISRUPTED', sc:'a', strikes:1,
+    weapon:'Interception debris near airport', cas:'None reported', dmg:'Brief ops pause ~45 min; no structural damage',
+    mwave:16, dwave:122, mstruck:0, dstruck:5, rate:'96%',
+    desc:'DXB briefly suspended operations after an object was intercepted near the airport. Aircraft entered holding patterns captured on Flightradar24. Israeli repatriation flights were halted. Operations resumed within 45 minutes. This was the second disruption to DXB during the campaign.',
+    news:[
+      {dot:'r',text:'Interception near DXB causes brief operational halt. Aircraft enter holding patterns.',time:'07 Mar · 09:00'},
+      {dot:'a',text:'Dubai Airports: "Minor incident resulting from fall of debris after an interception."',time:'07 Mar · 09:15'},
+      {dot:'a',text:'Israeli government-chartered repatriation flights suspended mid-operation.',time:'07 Mar · 09:45'},
+      {dot:'g',text:'Airport operations fully resume.',time:'07 Mar · 09:50'},
+    ],
+    links:[
+      {label:'Dubai Airports statement', url:'https://www.dubaiairports.ae/corporate/media-centre/press-releases'},
+      {label:'Flightradar24', url:'https://www.flightradar24.com/blog'},
+      {label:'Reuters: DXB disruption', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'AD7MAR', name:'Abu Dhabi — Debris Falls', area:'Abu Dhabi City', emirate:'Abu Dhabi',
+    lat:24.4539, lon:54.3773, type:'debris', day:'07mar', time:'~07:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor debris fall; no structural damage',
+    mwave:16, dwave:122, mstruck:0, dstruck:5, rate:'96%',
+    desc:'Interception debris fell in Abu Dhabi city as UAE air defences engaged the 7 March wave of 16 ballistic missiles and 122 drones. UAE MOD confirmed all 16 missiles were intercepted; 117 of 122 drones were also neutralised. Civil Defence teams deployed.',
+    news:[
+      {dot:'a',text:'Interception debris falls in Abu Dhabi city area. Civil Defence deployed.',time:'07 Mar · 07:00'},
+      {dot:'b',text:'UAE MOD: all 16 missiles and 117 of 122 drones neutralised.',time:'07 Mar · 10:00'},
+    ],
+    links:[
+      {label:'UAE MOD briefing', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'The National: Abu Dhabi', url:'https://www.thenationalnews.com/uae/iran-attacks'},
+    ]
+  },
+  {
+    id:'SHARJ7', name:'Sharjah — Interception Debris', area:'Sharjah City', emirate:'Sharjah',
+    lat:25.3462, lon:55.4209, type:'debris', day:'07mar', time:'~07:30 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None confirmed', dmg:'Minor; no structural damage',
+    mwave:16, dwave:122, mstruck:0, dstruck:5, rate:'96%',
+    desc:'Interception debris fell across Sharjah during the 7 March attack wave. UAE authorities confirmed no injuries. Sharjah borders Dubai to the north and sits in the same urban corridor.',
+    news:[
+      {dot:'a',text:'Debris from interceptions falls in Sharjah city. Emergency teams deployed.',time:'07 Mar · 07:30'},
+      {dot:'g',text:'No injuries confirmed. Civil Defence clears affected areas.',time:'07 Mar · 08:30'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'Gulf News: Sharjah', url:'https://gulfnews.com/uae/iran-attacks-2026'},
+    ]
+  },
+
+  // ══ 06 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'AD6A', name:'Abu Dhabi — Musaffah Debris', area:'ICAD / Musaffah', emirate:'Abu Dhabi',
+    lat:24.3667, lon:54.5100, type:'debris', day:'06mar', time:'~05:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor industrial area impact',
+    mwave:2, dwave:55, mstruck:0, dstruck:3, rate:'96%',
+    desc:'Interception debris fell in the industrial Musaffah area of Abu Dhabi during the 6 March wave — 2 missiles and 55 drones. All missiles intercepted; 3 drones reached UAE territory. This was the lightest day of the campaign by volume.',
+    news:[
+      {dot:'a',text:'Debris fall in Musaffah industrial area. Civil Defence respond. No injuries.',time:'06 Mar · 05:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'The National', url:'https://www.thenationalnews.com/uae/iran-attacks'},
+    ]
+  },
+  {
+    id:'FUJ6', name:'Fujairah — Debris Incident', area:'Fujairah City', emirate:'Fujairah',
+    lat:25.1288, lon:56.3264, type:'debris', day:'06mar', time:'~06:30 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor; no casualties',
+    mwave:2, dwave:55, mstruck:0, dstruck:3, rate:'96%',
+    desc:'Interception debris was reported in Fujairah on the UAE\'s eastern coast. Fujairah faces the Gulf of Oman — drones approaching from Iran over the Strait of Hormuz passed over this emirate before turning west toward the main population centres.',
+    news:[
+      {dot:'a',text:'Interception debris reported in Fujairah on east coast. No injuries confirmed.',time:'06 Mar · 06:30'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'Gulf News', url:'https://gulfnews.com/uae/iran-attacks-2026'},
+    ]
+  },
+
+  // ══ 05 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'ICAD2', name:'Abu Dhabi ICAD II — First Missile Strike', area:'Industrial City of Abu Dhabi', emirate:'Abu Dhabi',
+    lat:24.3509, lon:54.5235, type:'missile', day:'05mar', time:'~06:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Ballistic missile — first to strike UAE territory', cas:'6 workers injured (foreign nationals)', dmg:'Facility damage — industrial zone',
+    mwave:7, dwave:131, mstruck:1, dstruck:6, rate:'94%',
+    desc:'The first ballistic missile to strike UAE territory landed at Abu Dhabi\'s ICAD II industrial city, injuring six foreign workers. UAE MOD confirmed 6 of 7 missiles were intercepted; one fell within UAE territory. This was a significant escalation — the first actual missile impact on UAE soil in the campaign. Six drones also reached UAE territory that day.',
+    news:[
+      {dot:'r',text:'FIRST ballistic missile to strike UAE territory hits ICAD II, Abu Dhabi. 6 foreign workers injured.',time:'05 Mar · 06:00'},
+      {dot:'r',text:'UAE MOD: 1 of 7 missiles landed on UAE territory — unprecedented in this campaign.',time:'05 Mar · 07:00'},
+      {dot:'b',text:'UAE condemns attack at emergency UN Security Council session.',time:'05 Mar · 10:00'},
+    ],
+    links:[
+      {label:'UAE MOD statement', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'AP: First missile strike', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'UN Security Council', url:'https://www.un.org/securitycouncil/meetings-coverage'},
+    ]
+  },
+  {
+    id:'SHARJAH', name:'Sharjah — Industrial Warehouse', area:'Sharjah Industrial Area', emirate:'Sharjah',
+    lat:25.3200, lon:55.4900, type:'drone', day:'05mar', time:'~09:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Iranian drone (direct impact or debris)', cas:'None confirmed', dmg:'Warehouse fire — heavy smoke',
+    mwave:7, dwave:131, mstruck:1, dstruck:6, rate:'94%',
+    desc:'A black plume of smoke rose from a warehouse in Sharjah\'s industrial area, visible across northern Dubai. One of six drones that reached UAE territory on 5 March. Emergency services contained the fire.',
+    news:[
+      {dot:'a',text:'Black smoke from Sharjah City industrial warehouse fire.',time:'05 Mar · 09:00'},
+      {dot:'b',text:'Emergency teams deployed. Fire contained.',time:'05 Mar · 09:30'},
+    ],
+    links:[
+      {label:'Gulf News', url:'https://gulfnews.com/uae/iran-attacks-2026'},
+      {label:'Khaleej Times', url:'https://www.khaleejtimes.com/uae/iran-uae-conflict-2026'},
+    ]
+  },
+  {
+    id:'RAK5', name:'Ras Al Khaimah — Debris', area:'Ras Al Khaimah', emirate:'Ras Al Khaimah',
+    lat:25.7895, lon:55.9432, type:'debris', day:'05mar', time:'~08:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor; no structural damage',
+    mwave:7, dwave:131, mstruck:1, dstruck:6, rate:'94%',
+    desc:'Interception debris fell in Ras Al Khaimah — the UAE\'s northernmost emirate, closest to Iran across the Strait of Hormuz (~90km). RAK experienced debris falls on multiple days as drones were engaged early in their flight paths.',
+    news:[
+      {dot:'a',text:'Interception debris reported in RAK. No injuries.',time:'05 Mar · 08:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+    ]
+  },
+  {
+    id:'AD5DEB', name:'Abu Dhabi Suburbs — Debris', area:'Abu Dhabi suburbs', emirate:'Abu Dhabi',
+    lat:24.4200, lon:54.4500, type:'debris', day:'05mar', time:'~06:30 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor residential impacts',
+    mwave:7, dwave:131, mstruck:1, dstruck:6, rate:'94%',
+    desc:'Interception debris fell in Abu Dhabi suburban areas on 5 March following engagement of the incoming wave. No injuries confirmed.',
+    news:[
+      {dot:'a',text:'Debris from interceptions falls in Abu Dhabi suburban areas. No injuries.',time:'05 Mar · 06:30'},
+    ],
+    links:[
+      {label:'The National', url:'https://www.thenationalnews.com/uae/iran-attacks'},
+    ]
+  },
+
+  // ══ 04 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'AD4DEB', name:'Abu Dhabi — Industrial Zone Debris', area:'Musaffah Industrial', emirate:'Abu Dhabi',
+    lat:24.3580, lon:54.5050, type:'debris', day:'04mar', time:'~04:30 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor impact; no structural damage',
+    mwave:3, dwave:129, mstruck:0, dstruck:8, rate:'94%',
+    desc:'Interception debris fell across Abu Dhabi\'s Musaffah industrial zone on 4 March. Of 129 drones launched that day, 8 reached UAE territory. All 3 ballistic missiles were intercepted. UAE MOD confirmed no casualties.',
+    news:[
+      {dot:'a',text:'Debris from interceptions falls in Musaffah industrial area, Abu Dhabi. No injuries.',time:'04 Mar · 04:30'},
+      {dot:'b',text:'UAE MOD: 3 missiles intercepted, 8 drones reached territory on 4 March.',time:'04 Mar · 08:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'The National', url:'https://www.thenationalnews.com/uae/iran-attacks'},
+    ]
+  },
+
+  // ══ 03 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'CONSUL', name:'US Consulate Dubai', area:'Al Wasl Road, Jumeirah', emirate:'Dubai',
+    lat:25.2085, lon:55.2529, type:'drone', day:'03mar', time:'~23:30 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Iranian drone (Shahed-type)', cas:'None — fire quickly contained', dmg:'Parking lot fire — limited structural damage',
+    mwave:1, dwave:137, mstruck:0, dstruck:4, rate:'97%',
+    desc:'An Iranian drone struck the parking lot adjacent to the US Consulate chancellery on Al Wasl Road, Jumeirah. Secretary of State Rubio confirmed all personnel were accounted for. The US had drawn down to "bare bones" consulate staffing beforehand. Iran falsely claimed 100 Americans killed — the State Department described this as "complete disinformation." 1 missile and 137 drones were launched on 3 March; all 133 drones intercepted, 4 reached territory.',
+    news:[
+      {dot:'r',text:'Iranian drone strikes parking lot adjacent to US Consulate Dubai chancellery. Fire breaks out.',time:'03 Mar · 23:30'},
+      {dot:'a',text:'Rubio: "A drone struck the parking lot adjacent to the chancellery building, setting off a fire."',time:'04 Mar · 00:15'},
+      {dot:'g',text:'Fire contained. No injuries. Consulate at reduced staffing.',time:'04 Mar · 01:00'},
+      {dot:'b',text:'State Dept rejects Iran claim of 100 US dead: "Complete disinformation."',time:'05 Mar · 10:00'},
+    ],
+    links:[
+      {label:'State Dept statement', url:'https://www.state.gov/iran-uae-attacks-march-2026'},
+      {label:'AP: Consulate strike', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'Reuters: Rubio statement', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'AUH3A', name:'Abu Dhabi Airport — Debris', area:'Abu Dhabi International Airport', emirate:'Abu Dhabi',
+    lat:24.4330, lon:54.6511, type:'debris', day:'03mar', time:'~02:00 GST',
+    status:'DISRUPTED', sc:'a', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Brief AUH disruption; no structural damage',
+    mwave:1, dwave:137, mstruck:0, dstruck:4, rate:'97%',
+    desc:'Abu Dhabi International Airport (AUH) experienced a brief disruption as interception debris fell in the vicinity. Operations paused briefly before resuming. AUH had been handling diverted traffic from DXB since 28 February.',
+    news:[
+      {dot:'a',text:'AUH briefly disrupted by interception debris. Operations resume quickly.',time:'03 Mar · 02:00'},
+    ],
+    links:[
+      {label:'Abu Dhabi Airports', url:'https://www.abudhabiairport.ae/en/media-centre/news'},
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+    ]
+  },
+  {
+    id:'UMM3', name:'Umm Al Quwain — Debris', area:'Umm Al Quwain', emirate:'Umm Al Quwain',
+    lat:25.5647, lon:55.5553, type:'debris', day:'03mar', time:'~03:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor; no casualties',
+    mwave:1, dwave:137, mstruck:0, dstruck:4, rate:'97%',
+    desc:'Interception debris fell in Umm Al Quwain, the UAE\'s smallest emirate by population, on 3 March. No injuries.',
+    news:[
+      {dot:'a',text:'Interception debris reported in Umm Al Quwain. No injuries.',time:'03 Mar · 03:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+    ]
+  },
+
+  // ══ 02 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'AJM2', name:'Ajman — Industrial Debris', area:'Ajman Industrial Area', emirate:'Ajman',
+    lat:25.4052, lon:55.5136, type:'debris', day:'02mar', time:'~04:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor industrial area impact',
+    mwave:9, dwave:148, mstruck:0, dstruck:5, rate:'97%',
+    desc:'Interception debris fell in Ajman\'s industrial area on 2 March. Of 148 drones launched, 5 reached UAE territory. Of 9 missiles, all were intercepted. Ajman is the smallest UAE emirate by land area and lies between Sharjah and Umm Al Quwain.',
+    news:[
+      {dot:'a',text:'Interception debris reported in Ajman industrial zone. Civil Defence deployed.',time:'02 Mar · 04:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'Khaleej Times', url:'https://www.khaleejtimes.com/uae/iran-uae-conflict-2026'},
+    ]
+  },
+  {
+    id:'AD2DEB', name:'Abu Dhabi Corniche — Debris', area:'Abu Dhabi Corniche', emirate:'Abu Dhabi',
+    lat:24.4672, lon:54.3488, type:'debris', day:'02mar', time:'~03:30 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor debris fall; no structural damage',
+    mwave:9, dwave:148, mstruck:0, dstruck:5, rate:'97%',
+    desc:'Interception debris fell near the Abu Dhabi Corniche waterfront area on 2 March. The Corniche runs along Abu Dhabi Island\'s seafront. No injuries reported.',
+    news:[
+      {dot:'a',text:'Debris falls near Abu Dhabi Corniche following successful interceptions.',time:'02 Mar · 03:30'},
+    ],
+    links:[
+      {label:'The National', url:'https://www.thenationalnews.com/uae/iran-attacks'},
+    ]
+  },
+
+  // ══ 01 MARCH ═══════════════════════════════════════════════════
+  {
+    id:'AUH1', name:'Abu Dhabi Airport — Drone Strike', area:'Abu Dhabi International Airport', emirate:'Abu Dhabi',
+    lat:24.4330, lon:54.6511, type:'drone', day:'01mar', time:'~05:30 GST',
+    status:'STRUCK', sc:'r', strikes:2,
+    weapon:'Iranian drone (Shahed-type)', cas:'1 killed (Bangladeshi national); 3 injured', dmg:'Terminal / apron damage; airport suspended',
+    mwave:28, dwave:332, mstruck:0, dstruck:14, rate:'96%',
+    desc:'A Shahed-type drone struck Abu Dhabi International Airport, killing a Bangladeshi worker and injuring three others. First confirmed fatality of the campaign. AUH was suspended, effectively closing the UAE to all commercial air traffic as DXB was already shut from 28 Feb. Of 332 drones launched on 1 March — the highest single-day drone total — 14 reached UAE territory. Strike count badge reflects two total incidents at AUH across the campaign.',
+    news:[
+      {dot:'r',text:'Drone strikes Abu Dhabi airport. 1 killed (Bangladeshi), 3 injured. Airport suspended.',time:'01 Mar · 05:30'},
+      {dot:'r',text:'Second fatality of campaign. AUH joins DXB in suspension — UAE air hub effectively closed.',time:'01 Mar · 07:00'},
+      {dot:'b',text:'UAE GCAA extends national airspace closure indefinitely.',time:'01 Mar · 08:00'},
+    ],
+    links:[
+      {label:'Abu Dhabi Airports', url:'https://www.abudhabiairport.ae/en/media-centre/news'},
+      {label:'AP: AUH strike', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'Reuters: UAE airspace', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'RESI', name:'South Dubai — Residential Debris', area:'South Dubai', emirate:'Dubai',
+    lat:25.0820, lon:55.2150, type:'debris', day:'01mar', time:'~08:00 GST',
+    status:'STRUCK', sc:'a', strikes:1,
+    weapon:'Interception debris (drone)', cas:'2 injured (minor)', dmg:'Courtyard impacts — minor structural',
+    mwave:28, dwave:332, mstruck:0, dstruck:14, rate:'96%',
+    desc:'Debris from intercepted drones fell in the courtyards of two homes in south Dubai, injuring two residents. Dubai Media Office: "Debris from drones intercepted by air defences fell in the courtyards of two homes in Dubai, resulting in two injuries."',
+    news:[
+      {dot:'r',text:'Debris from intercepted drones strikes two residential homes in Dubai. Two civilians injured.',time:'01 Mar · 08:00'},
+      {dot:'b',text:'Dubai Media Office: "The injured have received the necessary medical care."',time:'01 Mar · 08:30'},
+    ],
+    links:[
+      {label:'Dubai Media Office', url:'https://www.dmo.gov.ae/en/MediaCenter/News'},
+      {label:'Gulf News', url:'https://gulfnews.com/uae/iran-attacks-2026'},
+    ]
+  },
+  {
+    id:'JEBEL2', name:'Jebel Ali Port — Second Fire', area:'Jebel Ali', emirate:'Dubai',
+    lat:25.0090, lon:55.0630, type:'debris', day:'01mar', time:'~07:30 GST',
+    status:'DEBRIS', sc:'p', strikes:2,
+    weapon:'Interception debris', cas:'None reported', dmg:'Port berth fire — shipping disrupted',
+    mwave:28, dwave:332, mstruck:0, dstruck:14, rate:'96%',
+    desc:'A second incident at Jebel Ali Port — dark smoke as interception debris caused another berth fire within the port complex. The photograph of a yacht sailing past the smoke plume became internationally recognised. This was the second Jebel Ali incident in 48 hours. Strike badge reflects two total hits at Jebel Ali across the campaign.',
+    news:[
+      {dot:'a',text:'Dark smoke above Jebel Ali Port. Second debris-related fire in 24 hours.',time:'01 Mar · 07:30'},
+      {dot:'a',text:'Civil Defence deployed. Cargo handling paused in affected berths.',time:'01 Mar · 08:00'},
+    ],
+    links:[
+      {label:'Jebel Ali Port (DP World)', url:'https://www.jebaliport.com/en/news'},
+      {label:'Lloyd\'s List', url:'https://lloydslist.com/iran-uae-shipping-2026'},
+      {label:'Reuters: port disruption', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'NEPALESE', name:'Abu Dhabi — Worker Killed', area:'Abu Dhabi suburbs', emirate:'Abu Dhabi',
+    lat:24.3800, lon:54.5900, type:'debris', day:'01mar', time:'~06:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Interception debris', cas:'1 killed (Nepalese national)', dmg:'Fatal debris impact',
+    mwave:28, dwave:332, mstruck:0, dstruck:14, rate:'96%',
+    desc:'A Nepalese national was killed by interception debris in an Abu Dhabi suburban area on 1 March. Third fatality of the campaign and second in Abu Dhabi.',
+    news:[
+      {dot:'r',text:'Nepalese worker killed by interception debris in Abu Dhabi suburban area.',time:'01 Mar · 06:00'},
+      {dot:'b',text:'UAE government: "We mourn every life lost because of Iran\'s reckless attacks."',time:'01 Mar · 09:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'AP: UAE casualties', url:'https://apnews.com/hub/united-arab-emirates'},
+    ]
+  },
+  {
+    id:'SHJ1', name:'Sharjah City — Debris Impacts', area:'Central Sharjah', emirate:'Sharjah',
+    lat:25.3000, lon:55.3800, type:'debris', day:'01mar', time:'~04:00 GST',
+    status:'DEBRIS', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Minor debris falls; no structural damage',
+    mwave:28, dwave:332, mstruck:0, dstruck:14, rate:'96%',
+    desc:'Interception debris fell across central Sharjah during the massive 1 March wave (332 drones + 28 missiles — the heaviest single day of the campaign). No injuries confirmed in Sharjah City.',
+    news:[
+      {dot:'a',text:'Debris falls in Sharjah city during interception activity. No injuries.',time:'01 Mar · 04:00'},
+    ],
+    links:[
+      {label:'Gulf News', url:'https://gulfnews.com/uae/iran-attacks-2026'},
+    ]
+  },
+
+  // ══ 28 FEBRUARY ══════════════════════════════════════════════════
+  {
+    id:'AWS', name:'Amazon Web Services Data Centre', area:'Dubai (mec1-az2/az3)', emirate:'Dubai',
+    lat:25.1880, lon:55.3190, type:'mixed', day:'28feb', time:'04:30 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Unidentified projectile — drone probable', cas:'None reported', dmg:'Data centre fire; power shut; az3 power issues',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'AWS reported its mec1-az2 data centre caught fire after being struck by "objects." Power was shut down immediately. Later that day, AWS reported "localised power issues" in mec1-az3. First confirmed targeting of commercial cloud infrastructure in a Gulf conflict. Of 209 drones launched on 28 February, 21 reached UAE territory — the highest single-day drone-strikes figure of the campaign.',
+    news:[
+      {dot:'r',text:'AWS: "One of our data centres in mec1-az2 is on fire after being struck by objects. Power shut down."',time:'28 Feb · 04:30'},
+      {dot:'a',text:'AWS reports localised power issues in mec1-az3. Regional cloud services disrupted.',time:'28 Feb · 18:00'},
+      {dot:'g',text:'AWS partially restores services.',time:'28 Feb · 22:00'},
+    ],
+    links:[
+      {label:'AWS Service Health', url:'https://health.aws.amazon.com/health/status'},
+      {label:'Reuters: AWS strike', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+      {label:'The Register', url:'https://www.theregister.com/2026/02/28/aws_dubai_data_centre/'},
+    ]
+  },
+  {
+    id:'BKHAL', name:'Burj Khalifa Vicinity — Smoke', area:'Downtown Dubai', emirate:'Dubai',
+    lat:25.1972, lon:55.2744, type:'debris', day:'28feb', time:'~03:30 GST',
+    status:'SMOKE', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None confirmed', dmg:'Smoke plumes; no structural damage to tower',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'Smoke observed near the Burj Khalifa (828m, world\'s tallest building) following interception activity in Downtown Dubai. No structural damage. Downtown locked down as a precaution.',
+    news:[
+      {dot:'a',text:'Smoke plumes near Burj Khalifa following interception activity over Downtown Dubai.',time:'28 Feb · 03:30'},
+      {dot:'b',text:'No structural damage to Burj Khalifa. Area secured.',time:'28 Feb · 04:00'},
+    ],
+    links:[
+      {label:'Dubai Media Office', url:'https://www.dmo.gov.ae/en/MediaCenter/News'},
+      {label:'BBC: Dubai landmarks', url:'https://www.bbc.com/news/topics/c77jz3mdmget/iran-attacks-uae'},
+    ]
+  },
+  {
+    id:'BARAB', name:'Burj Al Arab Hotel', area:'Jumeirah Beach Road', emirate:'Dubai',
+    lat:25.1412, lon:55.1853, type:'debris', day:'28feb', time:'~03:00 GST',
+    status:'DEBRIS HIT', sc:'p', strikes:1,
+    weapon:'Interception fragments — ballistic missile', cas:'None reported', dmg:'Facade fire — quickly controlled',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'Fragments from intercepted Iranian missiles struck the Burj Al Arab facade (321m), causing an exterior fire rapidly controlled by Civil Defence. UAE confirmed interception debris — not a direct strike. Images circulated globally as a defining image of the campaign.',
+    news:[
+      {dot:'r',text:'Interception debris strikes Burj Al Arab facade. Fire visible on exterior of landmark.',time:'28 Feb · 03:00'},
+      {dot:'a',text:'UAE: Damage from interception fragments, not a direct strike.',time:'28 Feb · 03:30'},
+      {dot:'g',text:'Fire controlled. No casualties.',time:'28 Feb · 04:00'},
+    ],
+    links:[
+      {label:'Dubai Media Office', url:'https://www.dmo.gov.ae/en/MediaCenter/News'},
+      {label:'AP: Burj Al Arab fire', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'Reuters', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'JEBEL1', name:'Jebel Ali Port — Initial Fire', area:'Jebel Ali', emirate:'Dubai',
+    lat:25.0157, lon:55.0694, type:'debris', day:'28feb', time:'~02:30 GST',
+    status:'DEBRIS HIT', sc:'p', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Berth fire — contained; port disrupted',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'Debris from an intercepted Iranian projectile struck a berth at Jebel Ali Port (~15 million TEU/year, world\'s 11th busiest container port). A fire broke out and was rapidly contained. First of two Jebel Ali incidents in 48 hours.',
+    news:[
+      {dot:'a',text:'Fire at Jebel Ali Port berth. Dubai confirms interception debris as cause.',time:'28 Feb · 02:30'},
+      {dot:'a',text:'Civil Defence extinguishes fire. Cargo handling disrupted.',time:'28 Feb · 03:00'},
+    ],
+    links:[
+      {label:'DP World / Jebel Ali', url:'https://www.jebaliport.com/en/news'},
+      {label:'Lloyd\'s List', url:'https://lloydslist.com/iran-uae-shipping-2026'},
+    ]
+  },
+  {
+    id:'PALM', name:'Fairmont The Palm Hotel', area:'Palm Jumeirah', emirate:'Dubai',
+    lat:25.1125, lon:55.1386, type:'drone', day:'28feb', time:'~02:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Iranian drone — Shahed-type, direct impact', cas:'4 injured (blast & debris)', dmg:'Large explosion and fire — contained',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'A Shahed-type drone struck near Fairmont The Palm on Palm Jumeirah. Large explosion and fire erupted. Windows shattered in surrounding buildings. Four injured. One of 21 drones to reach UAE territory on the opening night.',
+    news:[
+      {dot:'r',text:'Large explosion at Fairmont The Palm, Palm Jumeirah. Fire and smoke visible from across Dubai.',time:'28 Feb · 02:00'},
+      {dot:'a',text:'Civil Defence: fire now under control. Four individuals injured.',time:'28 Feb · 02:30'},
+    ],
+    links:[
+      {label:'Dubai Media Office', url:'https://www.dmo.gov.ae/en/MediaCenter/News'},
+      {label:'AP: Dubai hotels struck', url:'https://apnews.com/hub/united-arab-emirates'},
+      {label:'Reuters', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'DXB28', name:'Dubai Airport — Terminal 3 Strike', area:'Al Garhoud', emirate:'Dubai',
+    lat:25.2532, lon:55.3657, type:'drone', day:'28feb', time:'01:30 GST',
+    status:'STRUCK', sc:'r', strikes:2,
+    weapon:'Iranian drone — Shahed-type, direct impact on apron', cas:'4 injured (airport staff)', dmg:'Minor structural damage — concourse apron',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'A drone struck a concourse at Dubai International Airport Terminal 3 (world\'s busiest airport by international passengers — 86.9m pax in 2023) at 01:30 GST. Four staff injured. All Emirates flights suspended within hours, triggering the regional aviation shutdown. UAE GCAA closed national airspace. Strike badge reflects two total incidents at DXB across the campaign (28 Feb + 7 Mar).',
+    news:[
+      {dot:'r',text:'Drone impacts concourse apron at DXB Terminal 3. Four airport staff injured.',time:'28 Feb · 01:30'},
+      {dot:'a',text:'All Emirates flights suspended. UAE GCAA declares national airspace closure.',time:'28 Feb · 02:45'},
+      {dot:'b',text:'UAE govt: hotel costs covered for all stranded passengers.',time:'28 Feb · 07:30'},
+    ],
+    links:[
+      {label:'Dubai Airports statement', url:'https://www.dubaiairports.ae/corporate/media-centre/press-releases'},
+      {label:'Emirates: flight suspension', url:'https://www.emirates.com/english/help/travel-updates/'},
+      {label:'Reuters: DXB strike', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'PAKNAT', name:'Abu Dhabi — First Fatality', area:'Abu Dhabi (location undisclosed)', emirate:'Abu Dhabi',
+    lat:24.4350, lon:54.4450, type:'debris', day:'28feb', time:'~03:00 GST',
+    status:'STRUCK', sc:'r', strikes:1,
+    weapon:'Interception debris / drone', cas:'1 killed (Pakistani national)', dmg:'Fatal debris impact',
+    mwave:137, dwave:209, mstruck:0, dstruck:21, rate:'97%',
+    desc:'A Pakistani national was killed in Abu Dhabi during the opening night — the first fatality of the conflict. Precise location not publicly disclosed by UAE authorities. UAE MOD confirmed a fatality caused by falling interception debris from the air defence engagement.',
+    news:[
+      {dot:'r',text:'FIRST fatality confirmed — Pakistani national killed in Abu Dhabi by interception debris.',time:'28 Feb · 03:00'},
+      {dot:'b',text:'UAE: "We hold the Iranian regime responsible for every life lost on UAE soil."',time:'28 Feb · 08:00'},
+    ],
+    links:[
+      {label:'UAE MOD', url:'https://www.mod.gov.ae/en/media/news.aspx'},
+      {label:'AP: UAE casualties', url:'https://apnews.com/hub/united-arab-emirates'},
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════════
+//  MAP SETUP
+// ══════════════════════════════════════════════════════════════════
+const map = L.map('map', { center:[24.8, 54.9], zoom:8, zoomControl:false });
+L.control.zoom({ position:'topright' }).addTo(map);
+
+// Tile layers — English-only label variants
+// Voyager = CartoDB light with English place names
+// Two-layer approach: base tiles (no labels) + English-only label overlay
+const cartoLightBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
+  { attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:20 });
+const cartoLightLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+  { attribution:'', subdomains:'abcd', maxZoom:20 });
+const cartoLight = L.layerGroup([cartoLightBase, cartoLightLabels]);
+const cartoDarkBase = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+  { attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:20 });
+const cartoDarkLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+  { attribution:'', subdomains:'abcd', maxZoom:20 });
+const cartoDark = L.layerGroup([cartoDarkBase, cartoDarkLabels]);
+// OSM standard — English labels in the Gulf region
+// Stadia Alidade Smooth — English labels globally including Gulf
+const osmStreetBase = L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png',
+  { attribution:'© Stadia Maps © OpenMapTiles © OpenStreetMap', maxZoom:20 });
+const osmStreetLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png',
+  { attribution:'', subdomains:'abcd', maxZoom:20 });
+const osmStreet = L.layerGroup([osmStreetBase, osmStreetLabels]);
+
+cartoDark.addTo(map);   // DEFAULT = dark
+document.body.classList.add('dark-map');
+
+const lgInc = L.layerGroup().addTo(map);
+// Layer control removed — header buttons handle tile switching
+
+// ── State ──
+let activeDay = 'all', typeFilter = 'all', activeId = null;
+const MKR = {};
+
+// ── Map style switcher ──
+let currentStyle = 'light';
+function setMapStyle(style) {
+  [cartoLight, cartoDark, osmStreet].forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+  if (style === 'light')  { cartoLight.addTo(map); document.body.classList.remove('dark-map'); }
+  if (style === 'dark')   { cartoDark.addTo(map);  document.body.classList.add('dark-map'); }
+  if (style === 'street') { osmStreet.addTo(map);  document.body.classList.remove('dark-map'); }
+  currentStyle = style;
+  document.querySelectorAll('.msb').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('msb-'+style);
+  if (btn) btn.classList.add('active');
+}
+
+// ── Build date filter bar ──
+function buildDateBar() {
+  const bar = document.getElementById('date-bar');
+  bar.innerHTML = '';
+  DAYS.forEach(d => {
+    const btn = document.createElement('div');
+    btn.className = 'dbar-btn' + (d.k === 'all' ? ' all' : '') + (d.k === activeDay ? ' active' : '');
+    btn.textContent = d.l;
+    btn.onclick = () => setDay(d.k);
+    bar.appendChild(btn);
+  });
+}
+
+function setDay(day) {
+  activeDay = day;
+  buildDateBar();
+  buildMarkers();
+  buildList();
+  updateStats();
+  map.closePopup();
+}
+
+// ── Marker icon ──
+const T_ICON_HTML = {
+  drone:  '<svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><circle cx="10" cy="10" r="3.5" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/><circle cx="10" cy="10" r="1.2" fill="white"/><line x1="10" y1="1" x2="10" y2="4" stroke="white" stroke-width="1.3"/><line x1="10" y1="16" x2="10" y2="19" stroke="white" stroke-width="1.3"/><line x1="1" y1="10" x2="4" y2="10" stroke="white" stroke-width="1.3"/><line x1="16" y1="10" x2="19" y2="10" stroke="white" stroke-width="1.3"/></svg>',
+  missile:'<svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 2 L13 8 L11.2 8 L11.2 17 L8.8 17 L8.8 8 L7 8 Z" fill="white"/><path d="M8.8 13.5 L5.5 17.5 L8.8 16Z" fill="white"/><path d="M11.2 13.5 L14.5 17.5 L11.2 16Z" fill="white"/><circle cx="10" cy="3" r="1.3" fill="white"/></svg>',
+  debris: '<svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" fill="white"/><line x1="10" y1="2" x2="10" y2="5.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="14.5" x2="10" y2="18" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="2" y1="10" x2="5.5" y2="10" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="14.5" y1="10" x2="18" y2="10" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="4" y1="4" x2="6.5" y2="6.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="13.5" y1="13.5" x2="16" y2="16" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="16" y1="4" x2="13.5" y2="6.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/><line x1="4" y1="16" x2="6.5" y2="13.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>',
+  mixed:  '<svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M10 2.5 L18 17 L2 17 Z" stroke="white" stroke-width="1.5" stroke-linejoin="round" fill="rgba(255,255,255,0.15)"/><line x1="10" y1="8" x2="10" y2="12.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.5" r="1" fill="white"/></svg>',
+};
+
+function mkIcon(inc) {
+  const countBadge = inc.strikes > 1 ? `<div class="mc-count">${inc.strikes}×</div>` : '';
+  return L.divIcon({
+    className:'',
+    html:`<div class="mi"><div class="mc ${inc.type}">${T_ICON_HTML[inc.type] || ''}${countBadge}</div></div>`,
+    iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,20]
+  });
+}
+
+// ── Popup builder ──
+const T_LABEL = { drone:'Drone Strike', missile:'Ballistic Missile', debris:'Interception Debris', mixed:'Mixed / Unclear' };
+
+function mkPopup(inc) {
+  const d = DAILY[inc.day] || DAILY.all;
+  const casHit = !inc.cas.startsWith('None');
+  const newsHtml = inc.news.map(n => `
+    <div class="news-item">
+      <div class="news-dot ${n.dot}"></div>
+      <div class="news-body"><div class="news-text">${n.text}</div><div class="news-meta">${n.time}</div></div>
+    </div>`).join('');
+
+  const linksHtml = inc.links && inc.links.length ? `
+<div class="pu-links">
+  <div class="pu-links-title">Source references</div>
+  <div class="pu-link-row">
+    ${inc.links.map(l => `<a class="pu-link" href="${l.url}" target="_blank" rel="noopener"><span class="pu-link-icon">↗</span>${l.label}</a>`).join('')}
+  </div>
+</div>` : '';
+
+  return `
+<div class="pu-hdr ${inc.type}">
+  <div class="pu-top">
+    <div class="pu-icon-wrap ${inc.type}">${T_ICON_HTML[inc.type]||''}</div>
+    <div class="pu-meta">
+      <div class="pu-badges">
+        <div class="pu-tbadge ${inc.type}">${T_LABEL[inc.type].toUpperCase()}</div>
+        <div class="pu-sbadge ${inc.sc}">${inc.status}</div>
+        ${inc.strikes > 1 ? `<div class="pu-sbadge a">${inc.strikes}× TOTAL HITS</div>` : ''}
+      </div>
+      <div class="pu-name">${inc.name}</div>
+      <div class="pu-city">📍 ${inc.area} · <strong>${inc.emirate}</strong></div>
+      <div class="pu-dt">⏱ ${d.label} · ${inc.time}</div>
+    </div>
+  </div>
+</div>
+<div class="pu-body">
+<div class="pu-grid">
+  <div class="pu-cell"><div class="pu-cell-k">Weapon</div><div class="pu-cell-v">${inc.weapon}</div></div>
+  <div class="pu-cell"><div class="pu-cell-k">Casualties</div><div class="pu-cell-v ${casHit?'r':'g'}">${inc.cas}</div></div>
+  <div class="pu-cell"><div class="pu-cell-k">Damage</div><div class="pu-cell-v">${inc.dmg}</div></div>
+  <div class="pu-cell"><div class="pu-cell-k">Day intercept rate</div><div class="pu-cell-v g">${inc.rate}</div></div>
+  <div class="pu-cell"><div class="pu-cell-k">Missiles this wave</div><div class="pu-cell-v r">${inc.mwave} fired · ${inc.mstruck !== undefined ? inc.mstruck+' struck' : '—'}</div></div>
+  <div class="pu-cell"><div class="pu-cell-k">Drones this wave</div><div class="pu-cell-v a">${inc.dwave} fired · ${inc.dstruck !== undefined ? inc.dstruck+' struck' : '—'}</div></div>
+</div>
+<div class="pu-desc">${inc.desc}</div>
+<div class="pu-news"><div class="pu-news-title">Incident Timeline</div>${newsHtml}</div>
+${linksHtml}
+<div class="pu-foot">
+  <span>${inc.lat.toFixed(4)}°N ${inc.lon.toFixed(4)}°E · ${inc.emirate}</span>
+  <span>AKE International · 07 Mar 2026</span>
+</div>
+</div>`;
+}
+
+// ── Build markers ──
+function buildMarkers() {
+  lgInc.clearLayers();
+  Object.keys(MKR).forEach(k => delete MKR[k]);
+  const shown = INCIDENTS.filter(i =>
+    (activeDay === 'all' || i.day === activeDay) &&
+    (typeFilter === 'all' || i.type === typeFilter)
+  );
+  shown.forEach(inc => {
+    const m = L.marker([inc.lat, inc.lon], { icon:mkIcon(inc) })
+      .bindPopup(mkPopup(inc), { maxWidth:430, className:'', closeButton:true, autoPan:true, autoPanPaddingTopLeft:L.point(0, 100), autoPanPaddingBottomRight:L.point(10,40) })
+      .addTo(lgInc);
+    MKR[inc.id] = m;
+    m.on('popupopen',  () => { activeId = inc.id; hilite(inc.id, true);  });
+    m.on('popupclose', () => { if (activeId===inc.id) { activeId=null; hilite(inc.id,false); } });
+  });
+}
+
+// ── Build sidebar list ──
+function buildList() {
+  const el = document.getElementById('alist');
+  el.innerHTML = '';
+  const shown = INCIDENTS.filter(i =>
+    (activeDay === 'all' || i.day === activeDay) &&
+    (typeFilter === 'all' || i.type === typeFilter)
+  );
+  if (!shown.length) {
+    el.innerHTML = '<div style="padding:16px 12px;font-size:10px;color:var(--muted)">No incidents match current filters.</div>';
+    return;
+  }
+  shown.forEach(inc => {
+    const casHit = !inc.cas.startsWith('None');
+    const row = document.createElement('div');
+    row.className = 'ap-row'; row.id = 'row-'+inc.id;
+    row.innerHTML = `
+      <div class="ap-pip ${inc.type}"></div>
+      <div class="ap-info">
+        <div class="ap-name">${inc.name}</div>
+        <div class="ap-city">${inc.emirate}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;">
+        <div class="ap-badge2 ${inc.type}">${{drone:'Drone',missile:'Missile',debris:'Debris',mixed:'Mixed'}[inc.type]}</div>
+        ${casHit ? `<div style="font-size:7.5px;color:var(--missile);font-weight:600;letter-spacing:.03em;">⚠ Casualties</div>` : ''}
+      </div>`;
+    row.addEventListener('click', () => {
+      const m = MKR[inc.id];
+      if (m) { map.setView([inc.lat, inc.lon], Math.max(map.getZoom(),12), {animate:true}); setTimeout(() => m.openPopup(), 300); }
+      hilite(inc.id, true);
+    });
+    el.appendChild(row);
+  });
+}
+
+function hilite(id, on) {
+  document.querySelectorAll('.ap-row').forEach(r => r.classList.remove('on'));
+  const r = document.getElementById('row-'+id);
+  if (r && on) { r.classList.add('on'); r.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+}
+
+// ── Type filter ──
+function setTF(el, type) {
+  typeFilter = type;
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  buildMarkers(); buildList();
+}
+
+// ── Stats update ──
+function updateStats() {
+  const s = DAILY[activeDay] || DAILY.all;
+  const tl = s.ml + s.dl, ti = s.mi + s.di, ts = s.ms + s.ds;
+  const rate = tl > 0 ? Math.round(ti/tl*100) : 0;
+  // Header chips
+  document.getElementById('tot-launched').textContent = tl.toLocaleString();
+  document.getElementById('tot-missiles').textContent = s.ml;
+  document.getElementById('tot-drones').textContent   = s.dl.toLocaleString();
+  document.getElementById('tot-struck').textContent   = ts;
+  document.getElementById('tot-int').textContent      = rate+'%';
+  // Sidebar stats
+  document.getElementById('sg-m').textContent  = s.ml;
+  document.getElementById('sg-mi').textContent = s.mi+' intercept.';
+  document.getElementById('sg-ms').textContent = s.ms+' struck';
+  document.getElementById('sg-d').textContent  = s.dl.toLocaleString();
+  document.getElementById('sg-di').textContent = s.di.toLocaleString()+' intercept.';
+  document.getElementById('sg-ds').textContent = s.ds+' struck';
+  document.getElementById('sg-r').textContent  = rate+'%';
+  document.getElementById('sg-rs').textContent = ti.toLocaleString()+' / '+tl.toLocaleString()+' neutralised';
+  document.getElementById('sg-i').textContent  = s.inc;
+  document.getElementById('sg-is').textContent = 'confirmed UAE incidents';
+}
+
+// ── Clock ──
+function gulfNow(){ return new Date(Date.now() + 4*3600*1000); }
+function tick(){
+  const g = gulfNow();
+  document.getElementById('hts').textContent =
+    `${String(g.getUTCHours()).padStart(2,'0')}:${String(g.getUTCMinutes()).padStart(2,'0')}:${String(g.getUTCSeconds()).padStart(2,'0')} GST`;
+}
+
+// ── Refresh timer ──
+const SECS=60; let cd=SECS, tmr;
+function startTimer(){
+  clearInterval(tmr); cd=SECS;
+  tmr=setInterval(()=>{
+    cd--;
+    document.getElementById('pf').style.width = (cd/SECS*100)+'%';
+    document.getElementById('pcd').textContent = cd+'s';
+    if(cd<=0){ doRefresh(); cd=SECS; }
+  },1000);
+}
+function doRefresh(){ tick(); const b=document.getElementById('rfbtn'); b.classList.add('spin'); setTimeout(()=>b.classList.remove('spin'),700); }
+function manualRefresh(){ doRefresh(); startTimer(); }
+
+// ── Boot ──
+buildDateBar();
+buildMarkers();
+buildList();
+updateStats();
+tick();
+startTimer();
+setInterval(tick,1000);
+// Fit to all UAE
+map.fitBounds([[22.6, 51.5],[26.1, 56.4]], {padding:[22,22]});
+</script>
+</body>
+</html>
