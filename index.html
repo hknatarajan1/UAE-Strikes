@@ -629,14 +629,13 @@ const DAYS = [
   { k:'06mar', l:'06 Mar' },
   { k:'07mar', l:'07 Mar' },
   { k:'08mar', l:'08 Mar' },
-  // ← ADD NEW DAYS HERE: { k:'09mar', l:'09 Mar' },
 ];
 
 // ── Daily UAE-wide statistics (UAE MOD official briefings) ──
 // ── Daily UAE-wide statistics — verified from UAE MOD official statements ──
 // Cumulative cross-checks: ml 221 ✓ dl 1305 ✓ ms 2 ✓ ds 76 (as of end 07 Mar)
 const DAILY = {
-  all:    { label:'All Days (28 Feb–07 Mar)', ml:221, dl:1305, mi:218, di:1229, ms:2,  ds:76, inc:31 },
+  all:    { label:'All Days (28 Feb–08 Mar)', ml:237, dl:1422, mi:233, di:1346, ms:2,  ds:78, inc:33 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -645,8 +644,7 @@ const DAILY = {
   '05mar':{ label:'05 Mar',  ml:7,   dl:131,  mi:6,   di:125,  ms:1,  ds:6,  inc:4  },
   '06mar':{ label:'06 Mar',  ml:9,   dl:112,  mi:9,   di:109,  ms:0,  ds:3,  inc:2  },
   '07mar':{ label:'07 Mar',  ml:16,  dl:121,  mi:15,  di:119,  ms:0,  ds:2,  inc:5  },
-  '08mar':{ label:'08 Mar',  ml:0,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:0  },
-  // ← ADD NEW DAYS: { label:'09 Mar', ml:0, dl:0, mi:0, di:0, ms:0, ds:0, inc:0 },
+  '08mar':{ label:'08 Mar',  ml:16,  dl:117,  mi:15,  di:117,  ms:0,  ds:2,  inc:3  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -661,21 +659,56 @@ const INCIDENTS = [
   // Note: 08 Mar MOD daily statement pending confirmation at time of publication
   // Cumulative through 07 Mar: 221 missiles, 1,305 drones (UAE MOD / The Federal)
   {
-    id:'AD8MAR', name:'Abu Dhabi — Interception Activity', area:'Abu Dhabi', emirate:'Abu Dhabi',
-    lat:24.4539, lon:54.3773, type:'debris', day:'08mar', time:'~10:00 GST',
-    status:'DEBRIS', sc:'p', strikes:1,
-    weapon:'Interception debris', cas:'None reported', dmg:'No structural damage confirmed',
-    mwave:0, dwave:0, mstruck:0, dstruck:0, rate:'—',
-    desc:'UAE MOD and NCEMA issued alerts on 8 March confirming air defence systems were responding to incoming missiles and drones. All-clear issued shortly after 10:30 GST. Exact daily launch figures pending official UAE MOD end-of-day statement. Cumulative total through 07 March: 221 ballistic missiles, 1,305 drones (The Federal / UAE MOD).',
+    id:'DXB8MAR_BARSHA', name:'Al Barsha — Motorist Killed by Debris', area:'Al Barsha, Dubai', emirate:'Dubai',
+    lat:25.1055, lon:55.1945, type:'debris', day:'08mar', time:'~22:00 GST',
+    status:'STRUCK — 1 KIA', sc:'r', strikes:1,
+    weapon:'Interception debris (missile fragment)', cas:'1 killed — Pakistani national', dmg:'Vehicle destroyed', rate:'—',
+    mwave:0, dwave:0, mstruck:0, dstruck:1,
+    desc:'Debris from an intercepted incoming projectile fell on a vehicle in Al Barsha, Dubai, killing a Pakistani motorist. Dubai Media Office confirmed the victim as an Asian national. This was the fourth confirmed death from Iran strikes on the UAE since 28 February. UAE President MBZ visited wounded patients in hospital the same day declaring the UAE to be in "a period of war".',
     news:[
-      {dot:'a',text:'UAE MOD and NCEMA issue alert ~10:00 GST: air defences responding to incoming threats.',time:'08 Mar · 10:00'},
-      {dot:'g',text:'All-clear issued. MOD: "Sounds heard are result of air defence systems intercepting missiles and drones."',time:'08 Mar · 10:30'},
-      {dot:'b',text:'Emirates and flydubai resume DXB operations after brief suspension.',time:'08 Mar · 11:00'},
+      {dot:'r',text:'Debris from intercepted projectile strikes vehicle in Al Barsha, Dubai.',time:'08 Mar · 22:00'},
+      {dot:'r',text:'Pakistani motorist confirmed killed. Dubai Media Office confirms Asian national.',time:'08 Mar · 22:30'},
+      {dot:'b',text:'Pakistan Consulate Dubai: assisting family with repatriation process.',time:'08 Mar · 23:00'},
+      {dot:'b',text:'UAE death toll rises to four: 2 Pakistani, 1 Nepali, 1 Bangladeshi nationals.',time:'08 Mar · 23:30'},
     ],
     links:[
-      {label:'UAE MOD (@modgovae)', url:'https://x.com/modgovae'},
-      {label:'NCEMA UAE', url:'https://www.ncema.gov.ae/en'},
-      {label:'The Federal: 08 Mar roundup', url:'https://thefederal.com/category/international/iran-war-escalates-as-israeli-strikes-hit-tehran-fuel-facility-233239'},
+      {label:'The National', url:'https://www.thenationalnews.com/news/uae/2026/03/08/abu-dhabi-residents-urged-to-shelter-as-uae-faces-further-iran-strikes/'},
+      {label:'Al Jazeera', url:'https://www.aljazeera.com/news/2026/3/7/uae-president-says-prepared-to-confront-threats-as-iran-attacks-continue'},
+    ]
+  },
+  {
+    id:'DXB8MAR_MARINA', name:'Dubai Marina — Tower Facade Damaged', area:'Dubai Marina', emirate:'Dubai',
+    lat:25.0811, lon:55.1400, type:'debris', day:'08mar', time:'~22:15 GST',
+    status:'STRUCK — NO CASUALTIES', sc:'a', strikes:1,
+    weapon:'Interception debris', cas:'None reported', dmg:'Tower facade damaged; windows shattered', rate:'—',
+    mwave:0, dwave:0, mstruck:0, dstruck:1,
+    desc:'Dubai Media Office confirmed debris from an aerial interception damaged the facade of a residential tower in Dubai Marina. No injuries were reported. Incident occurred alongside the Al Barsha motorist fatality as interception debris scattered across Dubai on the evening of 08 March, the day UAE declared a formal state of defence.',
+    news:[
+      {dot:'a',text:'Interception debris damages facade of tower in Dubai Marina.',time:'08 Mar · 22:15'},
+      {dot:'g',text:'Dubai Media Office: no injuries from Dubai Marina tower incident.',time:'08 Mar · 22:45'},
+    ],
+    links:[
+      {label:'The National', url:'https://www.thenationalnews.com/news/uae/2026/03/08/abu-dhabi-residents-urged-to-shelter-as-uae-faces-further-iran-strikes/'},
+    ]
+  },
+  {
+    id:'AD8MAR_ALERTS', name:'Abu Dhabi — Triple Alert Wave / State of Defence', area:'Abu Dhabi', emirate:'Abu Dhabi',
+    lat:24.4539, lon:54.3773, type:'mixed', day:'08mar', time:'08:30–10:55 GST',
+    status:'INTERCEPTED', sc:'g', strikes:0,
+    weapon:'Iranian ballistic missiles + drones', cas:'None from 08 Mar intercepts', dmg:'None from intercepts', rate:'94%',
+    mwave:16, dwave:117, mstruck:0, dstruck:0,
+    desc:'UAE faced its heaviest single-day alert activity. NCEMA issued three mobile shelter-in-place warnings in Abu Dhabi between 08:30–10:55 GST plus one in Dubai. UAE MOD: 16 ballistic missiles detected — 15 intercepted, 1 fell to sea — plus 117 drones all intercepted. UAE declared a formal state of defence in response to ongoing Iranian aggression. President MBZ visited wounded patients in hospital, stating the UAE is in "a period of war" but will emerge stronger. Cumulative: 221 missiles (205 destroyed, 14 to sea, 2 landed), 1,305 drones (1,229 intercepted, 76 inside UAE). Total UAE toll since 28 Feb: 4 killed, 112 injured.',
+    news:[
+      {dot:'a',text:'NCEMA first alert — Abu Dhabi. Air defence responding to missile threats.',time:'08 Mar · 08:30'},
+      {dot:'a',text:'Second NCEMA alert. Third alert covers Dubai. Loud booms in both cities.',time:'08 Mar · 10:00'},
+      {dot:'g',text:'UAE MOD: 16 BMs detected — 15 intercepted, 1 to sea. 117 drones — all intercepted.',time:'08 Mar · 10:55'},
+      {dot:'b',text:'UAE declares formal state of defence. President MBZ: UAE is in a period of war.',time:'08 Mar · 14:00'},
+      {dot:'b',text:'Cumulative: 221 missiles, 1,305 drones tracked since 28 Feb. 4 dead, 112 injured.',time:'08 Mar · 18:00'},
+    ],
+    links:[
+      {label:'The National', url:'https://www.thenationalnews.com/news/uae/2026/03/08/abu-dhabi-residents-urged-to-shelter-as-uae-faces-further-iran-strikes/'},
+      {label:'Al Jazeera Day 9', url:'https://www.aljazeera.com/news/2026/3/8/iran-war-what-is-happening-on-day-nine-of-us-israel-attacks'},
+      {label:'Euronews', url:'https://www.euronews.com/2026/03/08/inside-the-uaes-response-to-iranian-attacks-a-senior-official-speaks'},
     ]
   },
 
