@@ -436,7 +436,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
     <div class="h-logo-sep"></div>
     <div>
       <div class="h-title">UAE — Iranian Strike Intelligence</div>
-      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">09 Mar 2026</span></div>
+      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">10 Mar 2026</span></div>
     </div>
   </div>
   <div class="h-right">
@@ -630,13 +630,14 @@ const DAYS = [
   { k:'07mar', l:'07 Mar' },
   { k:'08mar', l:'08 Mar' },
   { k:'09mar', l:'09 Mar' },
+  { k:'10mar', l:'10 Mar' },
 ];
 
 // ── Daily UAE-wide statistics (UAE MOD official briefings) ──
 // ── Daily UAE-wide statistics — verified from UAE MOD official statements ──
 // Cumulative cross-checks: ml 221 ✓ dl 1305 ✓ ms 2 ✓ ds 76 (as of end 07 Mar)
 const DAILY = {
-  all:    { label:'All Days (28 Feb–09 Mar)', ml:244, dl:1502, mi:240, di:1426, ms:2,  ds:78, inc:35 },
+  all:    { label:'All Days (28 Feb–09 Mar)', ml:253, dl:1440, mi:233, di:1359, ms:2,  ds:81, inc:36 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -646,7 +647,8 @@ const DAILY = {
   '06mar':{ label:'06 Mar',  ml:9,   dl:112,  mi:9,   di:109,  ms:0,  ds:3,  inc:2  },
   '07mar':{ label:'07 Mar',  ml:16,  dl:121,  mi:15,  di:119,  ms:0,  ds:2,  inc:5  },
   '08mar':{ label:'08 Mar',  ml:16,  dl:117,  mi:15,  di:117,  ms:0,  ds:2,  inc:3  },
-  '09mar':{ label:'09 Mar',  ml:7,   dl:80,   mi:7,   di:78,   ms:0,  ds:0,  inc:2  },
+  '09mar':{ label:'09 Mar',  ml:15,  dl:18,   mi:12,  di:17,   ms:0,  ds:1,  inc:2  },
+  '10mar':{ label:'10 Mar',  ml:0,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:1  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -655,6 +657,24 @@ const DAILY = {
 // ║  mstruck/dstruck = that struck UAE territory that day           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
+  // ══ 10 MARCH ══════════════════════════════════════════════════════
+  // UAE MOD end-of-day statement not yet published at time of update.
+  // Day 11 of the campaign. Attacks continuing per regional reporting.
+  {
+    id:'UAE10MAR', name:'UAE — Interception Activity (Day 11)', area:'UAE-wide', emirate:'Abu Dhabi',
+    lat:24.4539, lon:54.3773, type:'mixed', day:'10mar', time:'Ongoing',
+    status:'ONGOING — figures pending', sc:'a', strikes:0,
+    weapon:'Iranian ballistic missiles + drones', cas:'Pending MOD statement', dmg:'Pending MOD statement', rate:'—',
+    mwave:0, dwave:0, mstruck:0, dstruck:0,
+    desc:'Day 11 of Iranian strikes on the UAE. UAE MOD end-of-day statement not yet published at time of map update (10 Mar 2026 morning). Attacks on Gulf states are continuing per regional reporting. Cumulative through 09 Mar: 253 ballistic missiles detected (233 intercepted, 18 to sea, 2 landed), 1,440 drones detected (1,359 intercepted, 81 fell inside UAE), 8 cruise missiles all intercepted. Total UAE toll: 4 killed, 112 injured. This entry will be updated when official figures are released.',
+    news:[
+      {dot:'b',text:'Day 11: UAE MOD statement pending. Attacks on Gulf states continuing per regional sources.',time:'10 Mar · Morning'},
+    ],
+    links:[
+      {label:'UAE MOD (@modgovae)', url:'https://x.com/modgovae'},
+      {label:'NCEMA UAE', url:'https://www.ncema.gov.ae/en'},
+    ]
+  },
 
   // ══ 09 MARCH ══════════════════════════════════════════════════════
   // UAE MOD confirmed interceptions. 3 NCEMA alerts in Abu Dhabi (08:30–10:55 GST),
@@ -664,9 +684,9 @@ const INCIDENTS = [
     id:'AD9MAR_ALERTS', name:'Abu Dhabi / Dubai — Renewed Interception Wave', area:'Abu Dhabi & Dubai', emirate:'Abu Dhabi',
     lat:24.4539, lon:54.3773, type:'missile', day:'09mar', time:'~08:30 GST',
     status:'INTERCEPTED', sc:'g', strikes:0,
-    weapon:'Iranian ballistic missiles + drones', cas:'None confirmed', dmg:'None confirmed', rate:'~97%',
-    mwave:7, dwave:80, mstruck:0, dstruck:0,
-    desc:'Iran resumed attacks on the UAE on 9 March despite President Pezeshkian stated ceasefire, with three successive NCEMA shelter-in-place alerts issued in Abu Dhabi between 08:30 and 10:55 GST and one in Dubai. UAE MOD confirmed air defences intercepted incoming Iranian ballistic missiles, cruise missiles and drones. No casualties or structural damage were confirmed from the interceptions. The continued attacks, on day 10 of the war, came as Iran IRGC publicly contradicted Pezeshkian peace overture, signalling the attacks would continue. Cumulative toll from 28 Feb through 09 Mar: 4 killed, 112 injured.',
+    weapon:'Iranian ballistic missiles + drones', cas:'None confirmed — toll held at 4 killed, 112 injured', dmg:'1 drone fell inside UAE territory; no structural damage confirmed', rate:'94%',
+    mwave:15, dwave:18, mstruck:0, dstruck:1,
+    desc:'Iran resumed attacks on the UAE on 9 March despite President Pezeshkian stated ceasefire, with three successive NCEMA shelter-in-place alerts issued in Abu Dhabi between 08:30 and 10:55 GST and one in Dubai. UAE MOD confirmed air defences intercepted incoming Iranian ballistic missiles, cruise missiles and drones. No casualties or structural damage were confirmed from the interceptions. The continued attacks, on day 10 of the war, came as Iran IRGC publicly contradicted Pezeshkian peace overture, signalling the attacks would continue. UAE MOD reported 15 ballistic missiles (12 intercepted, 3 to sea) and 18 UAVs (17 intercepted, 1 fell inside UAE). No new casualties. Cumulative: 253 missiles, 1,440 drones since 28 Feb — 4 killed, 112 injured.',
     news:[
       {dot:'a',text:'NCEMA first alert — Abu Dhabi. Air defences responding to incoming missile and drone threats.',time:'09 Mar · 08:30'},
       {dot:'a',text:'NCEMA second alert — Abu Dhabi. Further threats detected; residents urged to shelter.',time:'09 Mar · 09:45'},
