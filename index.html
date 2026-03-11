@@ -436,7 +436,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
     <div class="h-logo-sep"></div>
     <div>
       <div class="h-title">UAE — Iranian Strike Intelligence</div>
-      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">10 Mar 2026</span></div>
+      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">11 Mar 2026</span></div>
     </div>
   </div>
   <div class="h-right">
@@ -631,13 +631,14 @@ const DAYS = [
   { k:'08mar', l:'08 Mar' },
   { k:'09mar', l:'09 Mar' },
   { k:'10mar', l:'10 Mar' },
+  { k:'11mar', l:'11 Mar' },
 ];
 
 // ── Daily UAE-wide statistics (UAE MOD official briefings) ──
 // ── Daily UAE-wide statistics — verified from UAE MOD official statements ──
 // Cumulative cross-checks: ml 221 ✓ dl 1305 ✓ ms 2 ✓ ds 76 (as of end 07 Mar)
 const DAILY = {
-  all:    { label:'All Days (28 Feb–09 Mar)', ml:253, dl:1440, mi:233, di:1359, ms:2,  ds:81, inc:36 },
+  all:    { label:'All Days (28 Feb–11 Mar)*', ml:270, dl:1477, mi:249, di:1385, ms:3,  ds:92, inc:38 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -648,7 +649,8 @@ const DAILY = {
   '07mar':{ label:'07 Mar',  ml:16,  dl:121,  mi:15,  di:119,  ms:0,  ds:2,  inc:5  },
   '08mar':{ label:'08 Mar',  ml:16,  dl:117,  mi:15,  di:117,  ms:0,  ds:2,  inc:3  },
   '09mar':{ label:'09 Mar',  ml:15,  dl:18,   mi:12,  di:17,   ms:0,  ds:1,  inc:2  },
-  '10mar':{ label:'10 Mar',  ml:0,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:1  },
+  '10mar':{ label:'10 Mar',  ml:17,  dl:35,   mi:16,  di:26,   ms:1,  ds:9,  inc:2  },
+  '11mar':{ label:'11 Mar*', ml:0,   dl:2,    mi:0,   di:0,    ms:0,  ds:2,  inc:2  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -657,22 +659,74 @@ const DAILY = {
 // ║  mstruck/dstruck = that struck UAE territory that day           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
-  // ══ 10 MARCH ══════════════════════════════════════════════════════
-  // UAE MOD end-of-day statement not yet published at time of update.
-  // Day 11 of the campaign. Attacks continuing per regional reporting.
+  // ══ 11 MARCH ══════════════════════════════════════════════════════
+  // UAE MOD active: air defences responding to missiles and drones. No end-of-day
+  // cumulative statement yet (day ongoing as of publish). 11 Mar cumulative TBC.
+  // Key incident: 2 drones fell near DXB — 4 injured. Air traffic unaffected.
   {
-    id:'UAE10MAR', name:'UAE — Interception Activity (Day 11)', area:'UAE-wide', emirate:'Abu Dhabi',
-    lat:24.4539, lon:54.3773, type:'mixed', day:'10mar', time:'Ongoing',
-    status:'ONGOING — figures pending', sc:'a', strikes:0,
-    weapon:'Iranian ballistic missiles + drones', cas:'Pending MOD statement', dmg:'Pending MOD statement', rate:'—',
-    mwave:0, dwave:0, mstruck:0, dstruck:0,
-    desc:'Day 11 of Iranian strikes on the UAE. UAE MOD end-of-day statement not yet published at time of map update (10 Mar 2026 morning). Attacks on Gulf states are continuing per regional reporting. Cumulative through 09 Mar: 253 ballistic missiles detected (233 intercepted, 18 to sea, 2 landed), 1,440 drones detected (1,359 intercepted, 81 fell inside UAE), 8 cruise missiles all intercepted. Total UAE toll: 4 killed, 112 injured. This entry will be updated when official figures are released.',
+    id:'DXB11MAR_DRONES', name:'Dubai International Airport Vicinity — Drones Fall', area:'Dubai International Airport, Dubai', emirate:'Dubai',
+    lat:25.2532, lon:55.3657, type:'debris', day:'11mar', time:'Morning GST',
+    status:'FELL — 4 injured, air traffic unaffected', sc:'p', strikes:1,
+    weapon:'Iranian drones (×2, type unconfirmed)', cas:'4 injured: 2 Ghanaians (minor), 1 Bangladeshi (minor), 1 Indian (moderate)', dmg:'Drones fell in the vicinity of Dubai International Airport. Minor injuries only. No runway or terminal damage reported.', rate:'—',
+    mwave:0, dwave:2, mstruck:0, dstruck:2,
+    desc:'UAE authorities confirmed that two drones fell in the vicinity of Dubai International Airport on 11 March. Four individuals were injured: two Ghanaian nationals (minor injuries), one Bangladeshi national (minor injuries), and one Indian national (moderate injuries). Officials confirmed air traffic was operating normally after the incident. The UAE MOD issued a statement: "Air Defence Systems intercepting missiles and drones." Early-morning NCEMA alerts had warned residents to remain in safe locations across Abu Dhabi and Bahrain, with UAE and Bahrain defence ministries both warning of potential threats. No end-of-day cumulative UAE MOD statement published at time of this update.',
     news:[
-      {dot:'b',text:'Day 11: UAE MOD statement pending. Attacks on Gulf states continuing per regional sources.',time:'10 Mar · Morning'},
+      { t:'ABC News — 11 Mar 2026', u:'https://abcnews.com/International/live-updates/iran-live-updates/?id=130893022' },
+      { t:'Al Jazeera Live — 11 Mar 2026', u:'https://www.aljazeera.com/news/liveblog/2026/3/11/iran-war-live-tehran-says-us-israel-hit-nearly-10000-civilian-sites' },
+    ]
+  },
+  {
+    id:'AD11MAR_ALERT', name:'Abu Dhabi Air Defence Alert — Missiles & Drones', area:'Abu Dhabi', emirate:'Abu Dhabi',
+    lat:24.4539, lon:54.3773, type:'mixed', day:'11mar', time:'Morning GST',
+    status:'INTERCEPTED — alert issued', sc:'g', strikes:0,
+    weapon:'Ballistic missiles and drones (numbers TBC)', cas:'None confirmed', dmg:'None confirmed', rate:'—',
+    mwave:0, dwave:0, mstruck:0, dstruck:0,
+    desc:'The UAE Ministry of Defence issued an active alert on 11 March stating: "UAE air defences are currently responding to incoming missile and drone threats from Iran." NCEMA urged the public to remain in safe locations. The UAE and Bahrain defence ministries both warned early on Wednesday of potential threats. Exact projectile counts for 11 March remain pending official UAE MOD end-of-day statement.',
+    news:[
+      { t:'ABC News — 11 Mar 2026', u:'https://abcnews.com/International/live-updates/iran-live-updates/?id=130893022' },
+      { t:'Al Jazeera Live — 11 Mar 2026', u:'https://www.aljazeera.com/news/liveblog/2026/3/11/iran-war-live-tehran-says-us-israel-hit-nearly-10000-civilian-sites' },
+    ]
+  },
+  // ══ 10 MARCH ══════════════════════════════════════════════════════
+  // UAE MOD cumulative (10 Mar): 270 missiles, 1,475 drones since 28 Feb.
+  // Key strikes: Ruwais refinery drone hit (ADNOC shutdown); DXB suspended.
+  // Toll updated: 6 killed, 122 injured (up from 4/112 on 09 Mar).
+  {
+    id:'AD10MAR_RUWAIS', name:'Ruwais Industrial Complex — Drone Strike & Refinery Shutdown', area:'Al Dhafra, Abu Dhabi', emirate:'Abu Dhabi',
+    lat:24.1102, lon:52.7300, type:'drone', day:'10mar', time:'Daytime GST',
+    status:'Struck — fire, ADNOC refinery shutdown', sc:'r', strikes:1,
+    weapon:'Iranian drone (Shahed-type)', cas:'None — no injuries reported', dmg:'Fire at Ruwais facility; ADNOC halted 922,000 bpd refinery as precautionary measure', rate:'—',
+    mwave:0, dwave:1, mstruck:0, dstruck:1,
+    desc:'An Iranian drone struck a facility inside the Ruwais Industrial Complex in Al Dhafra, approximately 240 km west of Abu Dhabi city, triggering a fire. The Abu Dhabi Media Office confirmed the attack and stated no injuries occurred. Abu Dhabi National Oil Company (ADNOC) halted operations at the Ruwais refinery — the Middle East\'s largest single-site refinery, capable of processing 922,000 barrels of crude per day — as a precautionary measure while damage was assessed. A source told Reuters the shutdown was precautionary and that all other operations at the wider complex continued normally. Separately, satellite imagery released on 10 Mar confirmed additional damage to hangars and fuel tanks at nearby Al Dhafra Air Base, where US forces are deployed. UAE MOD cumulative through 10 Mar: 270 ballistic missiles (249 intercepted) and 1,475 drones (1,385 intercepted) since 28 Feb.',
+    news:[
+      {dot:'r',text:'Iranian drone strikes Ruwais Industrial Complex — fire erupts; ADNOC shuts down the Middle East\'s largest refinery (922,000 bpd) as precaution.',time:'10 Mar · Daytime GST'},
+      {dot:'b',text:'Abu Dhabi Media Office: fire at Ruwais facility confirmed caused by drone attack. No injuries reported.',time:'10 Mar · @ADMediaOffice'},
+      {dot:'b',text:'Reuters: Ruwais refinery shut as precautionary measure; all other complex operations continuing normally.',time:'10 Mar · Reuters'},
+      {dot:'o',text:'OSINT satellite imagery (MizarVision) confirms additional damage to hangars and fuel tanks at Al Dhafra Air Base.',time:'10 Mar · MizarVision / OSINT'},
     ],
     links:[
-      {label:'UAE MOD (@modgovae)', url:'https://x.com/modgovae'},
-      {label:'NCEMA UAE', url:'https://www.ncema.gov.ae/en'},
+      {label:'The National — Ruwais drone strike', url:'https://www.thenationalnews.com/business/energy/2026/03/10/fire-breaks-out-at-al-ruwais-refinery-in-uae-after-drone-strike/'},
+      {label:'Bloomberg — ADNOC halts refinery', url:'https://www.bloomberg.com/news/articles/2026-03-10/uae-says-drone-attack-causes-fire-in-zone-that-houses-refinery'},
+      {label:'LWJ — 9–10 Mar updates', url:'https://www.longwarjournal.org/archives/2026/03/iranian-drone-and-missile-barrages-strike-arab-states-across-the-region-march-9-10-updates.php'},
+    ]
+  },
+  {
+    id:'DXB10MAR_SUSPEND', name:'Dubai International Airport — Suspended During Attack Wave', area:'Garhoud, Dubai', emirate:'Dubai',
+    lat:25.2532, lon:55.3657, type:'mixed', day:'10mar', time:'During attack wave',
+    status:'Intercepted — DXB suspended several hours', sc:'a', strikes:0,
+    weapon:'Iranian ballistic missiles + drones', cas:'None confirmed at DXB', dmg:'No structural damage confirmed at airport; operations suspended for several hours', rate:'~74%',
+    mwave:17, dwave:35, mstruck:1, dstruck:9,
+    desc:'During the 10 Mar attack wave, a barrage of missiles and drones targeted Dubai, prompting Dubai International Airport to suspend operations for several hours while air defences responded (Long War Journal). Emirates, running a reduced schedule since the partial reopening on 7 Mar, was operating to approximately 84 destinations at the time. DXB resumed limited operations after the wave passed. Day\'s UAE MOD figures: 17 ballistic missiles detected (16 intercepted, 1 impacted), 35 drones detected (26 intercepted, 9 fell inside UAE). Cumulative UAE toll updated to 6 killed and 122 injured since 28 Feb — 2 additional deaths and 10 additional injuries versus the 09 Mar figure.',
+    news:[
+      {dot:'r',text:'Dubai International Airport suspends operations for several hours during Iranian missile and drone barrage wave.',time:'10 Mar · LWJ / Dubai Airports'},
+      {dot:'b',text:'UAE MOD daily: 17 ballistic missiles detected (16 intercepted); 35 drones (26 intercepted, 9 fell inside UAE).',time:'10 Mar · @modgovae'},
+      {dot:'r',text:'UAE toll updated to 6 killed and 122 injured since 28 Feb — 2 additional deaths on 10 Mar.',time:'10 Mar · Wikipedia / UAE MOD'},
+      {dot:'b',text:'Emirates operating reduced schedule to ~84 destinations; DXB partially open under restricted capacity.',time:'10 Mar · Emirates / Dubai Airports'},
+    ],
+    links:[
+      {label:'LWJ — 9–10 Mar updates', url:'https://www.longwarjournal.org/archives/2026/03/iranian-drone-and-missile-barrages-strike-arab-states-across-the-region-march-9-10-updates.php'},
+      {label:'Wikipedia — 2026 Iranian strikes on UAE', url:'https://en.wikipedia.org/wiki/2026_Iranian_strikes_on_the_United_Arab_Emirates'},
+      {label:'Wego — UAE airspace status 10 Mar', url:'https://blog.wego.com/uae-airspace-closure-flight-status-affected-airlines-what-travelers-need-to-know/'},
     ]
   },
 
