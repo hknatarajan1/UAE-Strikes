@@ -641,7 +641,7 @@ const DAYS = [
 const DAILY = {
   // Cumulative through 12 Mar (partial — no end-of-day MOD statement yet for 11/12 Mar)
   // Through 10 Mar confirmed (Gulf News / UAE MOD): 262 ml, 241 mi, 19 sea, 2 landed; 1,475 dl
-  all:    { label:'All Days (28 Feb–12 Mar)*', ml:268, dl:1564, mi:241, di:1419, ms:2, ds:107, inc:38 },
+  all:    { label:'All Days (28 Feb–12 Mar)*', ml:268, dl:1564, mi:241, di:1419, ms:2, ds:108, inc:39 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -660,7 +660,7 @@ const DAILY = {
   // 12 Mar: UAE MOD — 6 BM + 7 cruise + 39 drones. No confirmed UAE ground-impact incidents yet.
   // 12 Mar*: IRGC/CBS News claim Iran fired 6 BM + 7 cruise + 39 drones at UAE.
   // No UAE MOD daily breakdown published yet — all di/ds/dl figures unconfirmed. Pending end-of-day MOD statement.
-  '12mar':{ label:'12 Mar*', ml:6,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:0  },
+  '12mar':{ label:'12 Mar*', ml:6,   dl:0,    mi:0,   di:0,    ms:0,  ds:1,  inc:1  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -670,9 +670,25 @@ const DAILY = {
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
   // ══ 12 MARCH ══════════════════════════════════════════════════════
-  // No confirmed UAE ground incidents at time of publication (today).
   // UAE MOD (CBS News): 6 BM + 7 cruise missiles + 39 drones fired at UAE on 12 Mar.
   // Wider regional attack wave ongoing — no UAE end-of-day statement published yet.
+  {
+    id:'DXB12MAR_CREEKHARBOUR', day:'12mar', emirate:'Dubai', sc:'p', type:'drone',
+    lat:25.2010, lon:55.3667,
+    name:'Creek Harbour — Drone Falls on Residential Building',
+    area:'Dubai Creek Harbour, Dubai',
+    time:'02:45 GST · 12 Mar',
+    status:'Drone fell', strikes:1,
+    weapon:'Iranian drone (fell — not intercepted)', cas:'None — no injuries reported', dmg:'Minor fire on building, extinguished within minutes. Building evacuated as precaution.', rate:'—',
+    mwave:6, mstruck:0, dwave:0, dstruck:1,
+    desc:'A drone fell on a residential building in Dubai Creek Harbour at approximately 02:45 GST. A minor fire broke out and was quickly extinguished by Civil Defence teams. The building was evacuated as a precaution. No injuries were reported. Dubai Media Office confirmed the incident. This is the first confirmed ground impact in Dubai on 12 March, occurring in the early hours before dawn.',
+    news:[
+      {dot:'p', text:'Drone impacts residential building, Creek Harbour. Building evacuated. Minor fire extinguished by Civil Defence. No injuries.', time:'02:45 GST · Dubai Media Office / Khaleej Times'},
+    ],
+    links:[
+      {label:'Khaleej Times — Creek Harbour drone falls on building', url:'https://www.khaleejtimes.com/uae/emergencies/dubai-creek-harbour-drone-falls-on-building-residents-evacuated-no-injuries'},
+    ],
+  },
 
   // ══ 11 MARCH (Wednesday) ══════════════════════════════════════════
   // Wednesday 11 Mar: DXB drone falls (4 injured, 11:38 GST) confirmed by Dubai Media Office.
