@@ -656,11 +656,11 @@ const DAILY = {
   '10mar':{ label:'10 Mar',  ml:9,   dl:35,   mi:8,   di:26,   ms:0,  ds:9,  inc:2  },
   // 11 Mar (Wednesday): UAE MOD via AJ Day 12 — 26 drones detected, 17 intercepted, 9 fell inside UAE.
   // DXB drone falls (2 of the 9) + AD old airport debris fire confirmed. No separate MOD missile statement.
-  '11mar':{ label:'11 Mar',  ml:0,   dl:26,   mi:0,   di:17,   ms:0,  ds:9,  inc:2  },
+  '11mar':{ label:'11 Mar',  ml:null, dl:26,   mi:null, di:17,   ms:null, ds:9, inc:2  },
   // 12 Mar: UAE MOD — 6 BM + 7 cruise + 39 drones. No confirmed UAE ground-impact incidents yet.
   // 12 Mar*: IRGC/CBS News claim Iran fired 6 BM + 7 cruise + 39 drones at UAE.
   // No UAE MOD daily breakdown published yet — all di/ds/dl figures unconfirmed. Pending end-of-day MOD statement.
-  '12mar':{ label:'12 Mar*', ml:6,   dl:0,    mi:0,   di:0,    ms:0,  ds:1,  inc:1  },
+  '12mar':{ label:'12 Mar*', ml:6,   dl:null, mi:null, di:null, ms:null, ds:1, inc:1  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -1568,23 +1568,29 @@ function setTF(el, type) {
 // ── Stats update ──
 function updateStats() {
   const s = DAILY[activeDay] || DAILY.all;
-  const tl = s.ml + s.dl, ti = s.mi + s.di, ts = s.ms + s.ds;
-  const rate = tl > 0 ? Math.round(ti/tl*100) : 0;
+  const na = v => (v === null || v === undefined);
+  const fmt = v => na(v) ? '—' : v.toLocaleString();
+  // Only include non-null values in totals / rate
+  const tl = (na(s.ml)?0:s.ml) + (na(s.dl)?0:s.dl);
+  const ti = (na(s.mi)?0:s.mi) + (na(s.di)?0:s.di);
+  const ts = (na(s.ms)?0:s.ms) + (na(s.ds)?0:s.ds);
+  const knownTotal = (!na(s.ml)||!na(s.dl)) && tl > 0;
+  const rate = knownTotal ? Math.round(ti/tl*100) : null;
   // Header chips
-  document.getElementById('tot-launched').textContent = tl.toLocaleString();
-  document.getElementById('tot-missiles').textContent = s.ml;
-  document.getElementById('tot-drones').textContent   = s.dl.toLocaleString();
+  document.getElementById('tot-launched').textContent = na(s.ml)&&na(s.dl) ? '—' : tl.toLocaleString();
+  document.getElementById('tot-missiles').textContent = fmt(s.ml);
+  document.getElementById('tot-drones').textContent   = fmt(s.dl);
   document.getElementById('tot-struck').textContent   = ts;
-  document.getElementById('tot-int').textContent      = rate+'%';
+  document.getElementById('tot-int').textContent      = na(rate) ? '—' : rate+'%';
   // Sidebar stats
-  document.getElementById('sg-m').textContent  = s.ml;
-  document.getElementById('sg-mi').textContent = s.mi+' intercept.';
-  document.getElementById('sg-ms').textContent = s.ms+' struck';
-  document.getElementById('sg-d').textContent  = s.dl.toLocaleString();
-  document.getElementById('sg-di').textContent = s.di.toLocaleString()+' intercept.';
-  document.getElementById('sg-ds').textContent = s.ds+' struck';
-  document.getElementById('sg-r').textContent  = rate+'%';
-  document.getElementById('sg-rs').textContent = ti.toLocaleString()+' / '+tl.toLocaleString()+' neutralised';
+  document.getElementById('sg-m').textContent  = fmt(s.ml);
+  document.getElementById('sg-mi').textContent = fmt(s.mi)+' intercept.';
+  document.getElementById('sg-ms').textContent = fmt(s.ms)+' struck';
+  document.getElementById('sg-d').textContent  = fmt(s.dl);
+  document.getElementById('sg-di').textContent = fmt(s.di)+' intercept.';
+  document.getElementById('sg-ds').textContent = fmt(s.ds)+' struck';
+  document.getElementById('sg-r').textContent  = na(rate) ? '—' : rate+'%';
+  document.getElementById('sg-rs').textContent = knownTotal ? ti.toLocaleString()+' / '+tl.toLocaleString()+' neutralised' : 'breakdown not yet published';
   document.getElementById('sg-i').textContent  = s.inc;
   document.getElementById('sg-is').textContent = 'confirmed UAE incidents';
 }
