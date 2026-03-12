@@ -641,7 +641,7 @@ const DAYS = [
 const DAILY = {
   // Cumulative through 12 Mar (partial — no end-of-day MOD statement yet for 11/12 Mar)
   // Through 10 Mar confirmed (Gulf News / UAE MOD): 262 ml, 241 mi, 19 sea, 2 landed; 1,475 dl
-  all:    { label:'All Days (28 Feb–12 Mar)*', ml:268, dl:1540, mi:241, di:1402, ms:2, ds:101, inc:38 },
+  all:    { label:'All Days (28 Feb–12 Mar)*', ml:268, dl:1564, mi:241, di:1419, ms:2, ds:107, inc:38 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -654,11 +654,13 @@ const DAILY = {
   '09mar':{ label:'09 Mar',  ml:15,  dl:18,   mi:12,  di:17,   ms:0,  ds:1,  inc:2  },
   // 10 Mar confirmed: UAE MOD — 9 missiles (8 destroyed, 1 sea), 35 drones (26 intercepted, 9 fell) [Gulf News / WAM]
   '10mar':{ label:'10 Mar',  ml:9,   dl:35,   mi:8,   di:26,   ms:0,  ds:9,  inc:2  },
-  // 11 Mar (Wednesday): DXB drone falls (2 fell) + AD old airport fire (1 fell debris).
-  // Wider wave data pending full MOD statement. DXB falls confirmed, AD fire confirmed.
-  '11mar':{ label:'11 Mar',  ml:0,   dl:2,    mi:0,   di:0,    ms:0,  ds:3,  inc:2  },
+  // 11 Mar (Wednesday): UAE MOD via AJ Day 12 — 26 drones detected, 17 intercepted, 9 fell inside UAE.
+  // DXB drone falls (2 of the 9) + AD old airport debris fire confirmed. No separate MOD missile statement.
+  '11mar':{ label:'11 Mar',  ml:0,   dl:26,   mi:0,   di:17,   ms:0,  ds:9,  inc:2  },
   // 12 Mar: UAE MOD — 6 BM + 7 cruise + 39 drones. No confirmed UAE ground-impact incidents yet.
-  '12mar':{ label:'12 Mar*', ml:6,   dl:39,   mi:0,   di:0,    ms:0,  ds:0,  inc:0  },
+  // 12 Mar*: IRGC/CBS News claim Iran fired 6 BM + 7 cruise + 39 drones at UAE.
+  // No UAE MOD daily breakdown published yet — all di/ds/dl figures unconfirmed. Pending end-of-day MOD statement.
+  '12mar':{ label:'12 Mar*', ml:6,   dl:0,    mi:0,   di:0,    ms:0,  ds:0,  inc:0  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -682,9 +684,10 @@ const INCIDENTS = [
     status:'STRUCK — 4 injured, operations continued', sc:'r', strikes:1,
     weapon:'Iranian drones ×2 (Shahed-type)', cas:'4 injured: 2 Ghanaians (minor), 1 Bangladeshi (minor), 1 Indian (moderate)', dmg:'Two drones fell in vicinity of Dubai International Airport. Takeoffs briefly paused; Emirates arrivals held in holding pattern over Oman. No runway closure; air traffic resumed normal.', rate:'—',
     mwave:0, dwave:2, mstruck:0, dstruck:2,
-    desc:'Two Iranian drones fell in the vicinity of Dubai International Airport on Wednesday morning 11 March. Dubai Media Office issued a statement at 11:38 GST confirming four people were wounded: two Ghanaian nationals (minor injuries), one Bangladeshi national (minor injuries), and one Indian national (moderate injuries). Takeoffs were briefly paused and Emirates arrivals were placed in holding patterns over Oman before the all-clear was given; air traffic then resumed normally (Flightradar24). Anwar Gargash, diplomatic adviser to the UAE President, condemned Iran\'s targeting of "civilian infrastructure and vital facilities." The UN Security Council voted 13-0 the same day demanding Iran halt attacks; China and Russia abstained.',
+    desc:'Two Iranian drones fell in the vicinity of Dubai International Airport on Wednesday morning 11 March. Dubai Media Office issued a statement at 11:38 GST confirming four people were wounded: two Ghanaian nationals (minor injuries), one Bangladeshi national (minor injuries), and one Indian national (moderate injuries). Takeoffs were briefly paused and Emirates arrivals were placed in holding patterns over Oman before the all-clear was given; air traffic then resumed normally (Flightradar24). The UAE MOD confirmed that 26 drones were detected UAE-wide on 11 March, of which 17 were intercepted and 9 fell inside UAE territory — the worst single-day drone interception rate (65%) of the campaign to date. The two DXB impacts were among those 9 ground impacts. Anwar Gargash, diplomatic adviser to the UAE President, condemned Iran\'s targeting of "civilian infrastructure and vital facilities." The UN Security Council voted 13-0 the same day demanding Iran halt attacks; China and Russia abstained.',
     news:[
       {dot:'r',text:'Dubai Media Office (11:38 GST): two drones fell near DXB — 4 injured. Air traffic operating as normal.',time:'11 Mar · @DXBMediaOffice'},
+      {dot:'r',text:'UAE MOD: 26 drones detected UAE-wide on 11 Mar — 17 intercepted, 9 fell inside UAE (65% rate, worst day of campaign).',time:'11 Mar · @modgovae / Al Jazeera Day 12'},
       {dot:'b',text:'Flightradar24: Emirates arrivals in holding patterns over Oman; takeoffs briefly paused.',time:'11 Mar · Flightradar24'},
       {dot:'b',text:'UN Security Council 13-0 vote: demands Iran halt attacks on Gulf neighbours. China and Russia abstain.',time:'11 Mar · UNSC'},
     ],
