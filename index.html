@@ -436,7 +436,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
     <div class="h-logo-sep"></div>
     <div>
       <div class="h-title">UAE — Iranian Strike Intelligence</div>
-      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">12 Mar 2026</span></div>
+      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">13 Mar 2026</span></div>
     </div>
   </div>
   <div class="h-right">
@@ -633,15 +633,16 @@ const DAYS = [
   { k:'10mar', l:'10 Mar' },
   { k:'11mar', l:'11 Mar' },
   { k:'12mar', l:'12 Mar' },
+  { k:'13mar', l:'13 Mar' },
 ];
 
 // ── Daily UAE-wide statistics (UAE MOD official briefings) ──
 // ── Daily UAE-wide statistics — verified from UAE MOD official statements ──
 // Cumulative cross-checks: ml 221 ✓ dl 1305 ✓ ms 2 ✓ ds 76 (as of end 07 Mar)
 const DAILY = {
-  // Cumulative through 12 Mar (partial — no end-of-day MOD statement yet for 11/12 Mar)
+  // Cumulative through 13 Mar (partial — full breakdown pending UAE MOD end-of-day statement)
   // Through 10 Mar confirmed (Gulf News / UAE MOD): 262 ml, 241 mi, 19 sea, 2 landed; 1,475 dl
-  all:    { label:'All Days (28 Feb–12 Mar)*', ml:268, dl:1564, mi:241, di:1419, ms:2, ds:108, inc:39 },
+  all:    { label:'All Days (28 Feb–13 Mar)*', ml:268, dl:1590, mi:241, di:1419, ms:2, ds:110, inc:41 },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -660,7 +661,8 @@ const DAILY = {
   // 12 Mar: UAE MOD — 6 BM + 7 cruise + 39 drones. No confirmed UAE ground-impact incidents yet.
   // 12 Mar*: IRGC/CBS News claim Iran fired 6 BM + 7 cruise + 39 drones at UAE.
   // No UAE MOD daily breakdown published yet — all di/ds/dl figures unconfirmed. Pending end-of-day MOD statement.
-  '12mar':{ label:'12 Mar*', ml:6,   dl:null, mi:null, di:null, ms:null, ds:1, inc:1  },
+  '12mar':{ label:'12 Mar',  ml:6,   dl:null, mi:null, di:null, ms:null, ds:0, inc:0  },
+  '13mar':{ label:'13 Mar*', ml:null, dl:26,   mi:null, di:null, ms:null, ds:2, inc:3  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -669,26 +671,71 @@ const DAILY = {
 // ║  mstruck/dstruck = that struck UAE territory that day           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
-  // ══ 12 MARCH ══════════════════════════════════════════════════════
-  // UAE MOD (CBS News): 6 BM + 7 cruise missiles + 39 drones fired at UAE on 12 Mar.
-  // Wider regional attack wave ongoing — no UAE end-of-day statement published yet.
+  // ══ 13 MARCH (Thursday) ══════════════════════════════════════════
+  // UAE MOD confirmed (Gulf News / The National): 10 BM + 26 drones engaged on 13 Mar.
+  // Cumulative through 13 Mar: 278 BM, 15 CM, 1,540 drones (UAE MOD via WAM).
+  // 3 confirmed Dubai incidents: Creek Harbour (drone fall, 02:45), Al Bada'a (drone crash, ~12:22), SZR debris (~12:55).
+  // No per-incident missile/interception breakdown published for 13 Mar.
   {
-    id:'DXB12MAR_CREEKHARBOUR', day:'12mar', emirate:'Dubai', sc:'p', type:'drone',
+    id:'DXB13MAR_CREEKHARBOUR', day:'13mar', emirate:'Dubai', sc:'p', type:'drone',
     lat:25.2010, lon:55.3667,
-    name:'Creek Harbour — Drone Falls on Residential Building',
+    name:'Address Creek Harbour 2 — Drone Strike, Apartment Fire',
     area:'Dubai Creek Harbour, Dubai',
-    time:'02:45 GST · 12 Mar',
-    status:'Drone fell', strikes:1,
-    weapon:'Iranian drone (fell — not intercepted)', cas:'None — no injuries reported', dmg:'Minor fire on building, extinguished within minutes. Building evacuated as precaution.', rate:'—',
-    mwave:6, mstruck:0, dwave:0, dstruck:1,
-    desc:'A drone fell on a residential building in Dubai Creek Harbour at approximately 02:45 GST. A minor fire broke out and was quickly extinguished by Civil Defence teams. The building was evacuated as a precaution. No injuries were reported. Dubai Media Office confirmed the incident. This is the first confirmed ground impact in Dubai on 12 March, occurring in the early hours before dawn.',
+    time:'02:45 GST · 13 Mar',
+    status:'Drone fell — minor fire, no injuries', strikes:1,
+    weapon:'Iranian drone (Shahed-type — fell)', cas:'None — no injuries reported', dmg:'Section of Address Creek Harbour 2 tower caught fire. Blaze contained to one or two apartments. Debris fell to street below. Building evacuated as precaution.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:1,
+    desc:'In the early hours of Thursday 13 March, a drone fell on the Address Creek Harbour 2 residential tower at approximately 02:45 GST. A minor fire broke out, visibly contained to one or two apartments based on social media footage. Civil Defence teams quickly extinguished the blaze. The building was evacuated as a precaution; residents sheltered in the basement car park. No injuries were reported. The Dubai Government Media Office confirmed the incident, saying the situation was "under control" and "all residents are safe." Images showed fire damage to the facade and debris on the street below. The UAE MOD confirmed 10 ballistic missiles and 26 drones were engaged UAE-wide on 13 March.',
     news:[
-      {dot:'p', text:'Drone impacts residential building, Creek Harbour. Building evacuated. Minor fire extinguished by Civil Defence. No injuries.', time:'02:45 GST · Dubai Media Office / Khaleej Times'},
+      {dot:'p', text:'Address Creek Harbour 2 struck by drone at 02:45 GST. Minor fire, evacuated, no injuries. Civil Defence confirm situation under control.', time:'02:45 GST · 13 Mar · Dubai Government Media Office'},
+      {dot:'b', text:'Social media footage shows fire contained to one or two apartments; debris on street below. Residents shelter in basement car park.', time:'13 Mar · Flightradar24 / social media'},
+      {dot:'b', text:'UAE MOD: 10 BM + 26 drones engaged UAE-wide on 13 Mar. Cumulative: 278 BM, 15 CM, 1,540 drones since 28 Feb.', time:'13 Mar · @modgovae / WAM'},
     ],
     links:[
-      {label:'Khaleej Times — Creek Harbour drone falls on building', url:'https://www.khaleejtimes.com/uae/emergencies/dubai-creek-harbour-drone-falls-on-building-residents-evacuated-no-injuries'},
+      {label:'The National — Dubai spate of drone incidents 13 Mar', url:'https://www.thenationalnews.com/news/uae/2026/03/12/fire-put-out-after-iranian-drone-slams-into-dubai-residential-tower/'},
+      {label:'Gulf News — Day 13 live blog', url:'https://gulfnews.com/uae/us-israel-war-on-iran-day-13-iran-hits-gulf-countries-minor-drone-incidents-in-dubai-1.500471643'},
     ],
   },
+  {
+    id:'DXB13MAR_BADAA', day:'13mar', emirate:'Dubai', sc:'p', type:'drone',
+    lat:25.2350, lon:55.2900,
+    name:'Al Bada\'a — Drone Crash, No Injuries',
+    area:'Al Bada\'a, Dubai',
+    time:'~12:22 GST · 13 Mar',
+    status:'Drone fell — no injuries', strikes:1,
+    weapon:'Iranian drone (fell — not intercepted)', cas:'None — no injuries reported', dmg:'Minor — drone fell in Al Bada\'a residential/commercial area. Relevant teams handled incident.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:1,
+    desc:'Dubai authorities reported responding to a minor incident involving a drone crash in the Al Bada\'a area of Dubai at approximately 12:22 GST on Thursday 13 March. Officials confirmed no injuries were reported. Relevant emergency teams assessed and handled the situation. The Al Bada\'a district sits between Jumeirah and the World Trade Centre area, near Dubai city centre. The incident was one of three confirmed drone impacts in Dubai on 13 March, the others being the earlier Address Creek Harbour 2 building fire and a debris impact on Sheikh Zayed Road.',
+    news:[
+      {dot:'p', text:'Dubai authorities responding to minor incident: drone crash in Al Bada\'a area. No injuries reported.', time:'~12:22 GST · 13 Mar · Dubai Government Media Office / Gulf News'},
+    ],
+    links:[
+      {label:'Gulf News — Day 13 live blog (Al Bada\'a incident)', url:'https://gulfnews.com/uae/us-israel-war-on-iran-day-13-iran-hits-gulf-countries-minor-drone-incidents-in-dubai-1.500471643'},
+      {label:'The National — Dubai spate of drone incidents 13 Mar', url:'https://www.thenationalnews.com/news/uae/2026/03/12/fire-put-out-after-iranian-drone-slams-into-dubai-residential-tower/'},
+    ],
+  },
+  {
+    id:'DXB13MAR_SZR', day:'13mar', emirate:'Dubai', sc:'p', type:'debris',
+    lat:25.2175, lon:55.2830,
+    name:'Sheikh Zayed Road — Interception Debris Hits Tower Facade',
+    area:'Sheikh Zayed Road, Dubai',
+    time:'~12:55 GST · 13 Mar',
+    status:'Debris impact — no injuries', strikes:0,
+    weapon:'Interception debris (from intercepted drone/missile)', cas:'None — no injuries reported', dmg:'Debris from a successful interception fell onto the facade of a building on Sheikh Zayed Road. Minor structural damage to exterior.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:0,
+    desc:'At approximately 12:55 GST on Thursday 13 March, Dubai authorities announced they were responding to a minor incident caused by debris from a successful air defence interception that fell onto the facade of a building on Sheikh Zayed Road. No injuries were reported. This type of debris impact — from intercepted rather than fallen projectiles — has been a recurring pattern throughout the campaign, with the UAE government consistently reminding residents that interception debris can cause localised damage without constituting a direct strike. Sheikh Zayed Road is Dubai\'s main arterial highway lined with skyscrapers, hotels and commercial towers.',
+    news:[
+      {dot:'p', text:'Dubai authorities responding to minor incident: debris from successful interception falls on Sheikh Zayed Road tower facade. No injuries.', time:'~12:55 GST · 13 Mar · Dubai Government Media Office / Gulf News'},
+    ],
+    links:[
+      {label:'Gulf News — Day 13 live blog (SZR debris)', url:'https://gulfnews.com/uae/us-israel-war-on-iran-day-13-iran-hits-gulf-countries-minor-drone-incidents-in-dubai-1.500471643'},
+      {label:'The National — Dubai spate of drone incidents 13 Mar', url:'https://www.thenationalnews.com/news/uae/2026/03/12/fire-put-out-after-iranian-drone-slams-into-dubai-residential-tower/'},
+    ],
+  },
+
+  // ══ 12 MARCH (Wednesday) ══════════════════════════════════════════
+  // UAE MOD (CBS News): 6 BM + 7 cruise missiles + 39 drones fired at UAE on 12 Mar.
+  // No UAE MOD end-of-day statement published for 12 Mar. dl, mi, di, ms all null.
 
   // ══ 11 MARCH (Wednesday) ══════════════════════════════════════════
   // Wednesday 11 Mar: DXB drone falls (4 injured, 11:38 GST) confirmed by Dubai Media Office.
@@ -1493,7 +1540,7 @@ function mkPopup(inc) {
 ${linksHtml}
 <div class="pu-foot">
   <span>${inc.lat.toFixed(4)}°N ${inc.lon.toFixed(4)}°E · ${inc.emirate}</span>
-  <span>AKE International · 07 Mar 2026</span>
+  <span>AKE International · 13 Mar 2026</span>
 </div>
 </div>`;
 }
