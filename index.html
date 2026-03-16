@@ -436,7 +436,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
     <div class="h-logo-sep"></div>
     <div>
       <div class="h-title">UAE — Iranian Strike Intelligence</div>
-      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">13 Mar 2026</span></div>
+      <div class="h-sub">Drone &amp; Missile Campaign · 28 Feb – <span id="hdate">16 Mar 2026</span></div>
     </div>
   </div>
   <div class="h-right">
@@ -634,6 +634,9 @@ const DAYS = [
   { k:'11mar', l:'11 Mar' },
   { k:'12mar', l:'12 Mar' },
   { k:'13mar', l:'13 Mar' },
+  { k:'14mar', l:'14 Mar' },
+  { k:'15mar', l:'15 Mar' },
+  { k:'16mar', l:'16 Mar' },
 ];
 
 // ── Daily UAE-wide statistics (UAE MOD official briefings) ──
@@ -642,7 +645,7 @@ const DAYS = [
 const DAILY = {
   // Cumulative through 13 Mar (partial — full breakdown pending UAE MOD end-of-day statement)
   // Through 10 Mar confirmed (Gulf News / UAE MOD): 262 ml, 241 mi, 19 sea, 2 landed; 1,475 dl
-  all:    { label:'All Days (28 Feb–13 Mar)*', ml:268, dl:1590, mi:241, di:1419, ms:2, ds:110, inc:41 },
+  all:    { label:'All Days (28 Feb–16 Mar)*', ml:298, cm:15,   dl:1606, mi:298, di:1606, cm_i:15, ms:3, ds:111, inc:46, frozenRate:95, minOnly:true },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
   '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
@@ -657,12 +660,15 @@ const DAILY = {
   '10mar':{ label:'10 Mar',  ml:9,   dl:35,   mi:8,   di:26,   ms:0,  ds:9,  inc:2  },
   // 11 Mar (Wednesday): UAE MOD via AJ Day 12 — 26 drones detected, 17 intercepted, 9 fell inside UAE.
   // DXB drone falls (2 of the 9) + AD old airport debris fire confirmed. No separate MOD missile statement.
-  '11mar':{ label:'11 Mar',  ml:null, dl:26,   mi:null, di:17,   ms:null, ds:9, inc:2  },
+  '11mar':{ label:'11 Mar',  ml:6,    cm:7,    dl:39,   mi:6,    cm_i:7,  di:39,   ms:null, ds:9, inc:2, minOnly:true  },
   // 12 Mar: UAE MOD — 6 BM + 7 cruise + 39 drones. No confirmed UAE ground-impact incidents yet.
   // 12 Mar*: IRGC/CBS News claim Iran fired 6 BM + 7 cruise + 39 drones at UAE.
   // No UAE MOD daily breakdown published yet — all di/ds/dl figures unconfirmed. Pending end-of-day MOD statement.
-  '12mar':{ label:'12 Mar',  ml:6,   dl:null, mi:null, di:null, ms:null, ds:0, inc:0  },
-  '13mar':{ label:'13 Mar*', ml:null, dl:26,   mi:null, di:null, ms:null, ds:2, inc:3  },
+  '12mar':{ label:'12 Mar',  ml:10,  dl:26,   mi:10,   di:26,     ms:null, ds:2,    inc:3, minOnly:true  },
+  '13mar':{ label:'13 Mar',  ml:7,    dl:27,   mi:7,    di:27,   ms:null, ds:0, inc:1, minOnly:true  },
+  '14mar':{ label:'14 Mar',  ml:9,    dl:33,   mi:9,    di:33,   ms:null, ds:0, inc:2, minOnly:true  },
+  '15mar':{ label:'15 Mar',  ml:4,    dl:6,    mi:4,    di:6,    ms:null, ds:0, inc:0, minOnly:true  },
+  '16mar':{ label:'16 Mar*', ml:null, dl:null, mi:null, di:null, ms:null, ds:1, inc:2, minOnly:true  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -671,25 +677,149 @@ const DAILY = {
 // ║  mstruck/dstruck = that struck UAE territory that day           ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
-  // ══ 13 MARCH (Thursday) ══════════════════════════════════════════
-  // UAE MOD confirmed (Gulf News / The National): 10 BM + 26 drones engaged on 13 Mar.
-  // Cumulative through 13 Mar: 278 BM, 15 CM, 1,540 drones (UAE MOD via WAM).
-  // 3 confirmed Dubai incidents: Creek Harbour (drone fall, 02:45), Al Bada'a (drone crash, ~12:22), SZR debris (~12:55).
-  // No per-incident missile/interception breakdown published for 13 Mar.
+  // ══ 16 MARCH (Monday) ════════════════════════════════════════════
+  // Monday 16 Mar: Drone strikes DXB fuel tank (~02:00 GST), massive fire, flights suspended 6:30am
+  // for 7+ hours, Emirates resumed limited ops 10am. Palestinian national killed by missile in Al Bahia
+  // area of Abu Dhabi (outskirts). UAE MOD daily figures not yet published. War Day 17.
   {
-    id:'DXB13MAR_CREEKHARBOUR', day:'13mar', emirate:'Dubai', sc:'p', type:'drone',
+    id:'DXB16MAR_AIRPORT', day:'16mar', emirate:'Dubai', sc:'r', type:'drone',
+    lat:25.2532, lon:55.3657,
+    name:'Dubai International Airport — Drone Strikes Fuel Tank, 7-Hour Closure',
+    area:'Dubai International Airport, Dubai',
+    time:'~02:00 GST · 16 Mar',
+    status:'STRUCK — fuel tank fire, 7+ hr closure, no injuries', strikes:1,
+    weapon:'Iranian drone (direct strike on fuel tank)', cas:'None — no injuries reported', dmg:'Drone struck a fuel tank in the vicinity of DXB. Massive fire broke out; Dubai Civil Defence contained the blaze. DXB suspended all flights at 06:30 GST. Emirates cancelled multiple services; inbound flights diverted to Al Maktoum (DWC). Limited operations resumed after 10:00 GST. Longest DXB suspension since the war began (7+ hours).', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:1,
+    desc:'In the early hours of Monday 16 March (Day 17 of the war), an Iranian drone struck a fuel tank in the vicinity of Dubai International Airport at approximately 02:00 GST. Dubai Media Office confirmed the incident, describing it as "a drone incident in the vicinity of Dubai International Airport" that "affected one of the fuel tanks." Dubai Civil Defence teams contained the resulting fire. The Dubai Civil Aviation Authority suspended all DXB flights from 06:30 GST as a precautionary measure. Emirates airline suspended all services and asked passengers not to travel to the airport. Inbound flights including Emirates EK307 (Beijing), EK319 (Narita), EK407 (Melbourne) and EK381 (Hong Kong) were diverted to Al Maktoum International Airport (DWC). Multiple departures were delayed or cancelled. Emirates resumed a limited schedule from 10:00 GST — the longest DXB shutdown since the war began. No injuries were reported. This is the third major drone-related incident at or near DXB since 28 February.',
+    news:[
+      {dot:'r', text:'Dubai Media Office: "drone incident in the vicinity of Dubai International Airport affected one of the fuel tanks." No injuries. Fire contained.', time:'~02:00 GST · 16 Mar · @DXBMediaOffice'},
+      {dot:'r', text:'Dubai Civil Aviation Authority: all DXB flights temporarily suspended from 06:30 GST as precautionary measure.', time:'06:30 GST · 16 Mar · DCAA / @DXBMediaOffice'},
+      {dot:'r', text:'Emirates: "All flights to and from Dubai have been temporarily suspended. Please do not go to the airport." Limited schedule resumed after 10:00 GST.', time:'16 Mar · @Emirates'},
+      {dot:'b', text:'Multiple inbound flights diverted to Al Maktoum (DWC). Flightradar24: EK307, EK319, EK407, EK381 among diverted flights. Some flights returned to origin airports.', time:'16 Mar · Flightradar24 / The National'},
+    ],
+    links:[
+      {label:'Bloomberg — Dubai airport resumes flights after drone fuel tank fire', url:'https://www.bloomberg.com/news/articles/2026-03-16/dubai-suspends-flights-at-main-airport-after-fuel-tank-attack'},
+      {label:'Times of Israel — Fire contained at DXB, flights suspended', url:'https://www.timesofisrael.com/liveblog_entry/fire-contained-in-vicinity-of-dubai-airport-after-drone-attack-flights-suspended/'},
+      {label:'The National — Which flights suspended at DXB', url:'https://www.thenationalnews.com/travel/2026/03/16/which-flights-are-suspended-or-delayed-at-dubai-airport-after-drone-incident/'},
+      {label:'CNBC — Dubai airport resumes limited flights after drone attack', url:'https://www.cnbc.com/2026/03/16/dubai-airport-suspends-flights-drone-attack.html'},
+    ],
+  },
+  {
+    id:'AD16MAR_ALBAHIA', day:'16mar', emirate:'Abu Dhabi', sc:'r', type:'missile',
+    lat:24.3600, lon:54.4700,
+    name:'Al Bahia — Missile Strikes Civilian Vehicle, 1 Killed',
+    area:'Al Bahia, Abu Dhabi',
+    time:'Morning GST · 16 Mar',
+    status:'STRUCK — 1 killed (Palestinian national)', strikes:1,
+    weapon:'Iranian ballistic missile (fell on civilian vehicle)', cas:'1 killed: Palestinian national (male)', dmg:'Missile struck a civilian vehicle in the Al Bahia area on the outskirts of Abu Dhabi. Vehicle destroyed. Road operations later returned to normal.', rate:'—',
+    mwave:null, mstruck:1, dwave:null, dstruck:0,
+    desc:'On Monday morning 16 March, Abu Dhabi authorities confirmed that a missile had fallen on a civilian vehicle in the Al Bahia area on the outskirts of Abu Dhabi, killing one Palestinian national. The Abu Dhabi Media Office stated: "Authorities in the Emirate of Abu Dhabi responded to an incident in the Al Bahia area involving a missile strike on a civilian vehicle, which resulted in the death of one Palestinian national." The public was urged to rely only on official sources. The incident brings the total civilian death toll in the UAE from Iranian attacks to seven. Al Bahia is a suburb located southwest of Abu Dhabi city centre. The attack occurred on the same morning as the drone strike on the Dubai International Airport fuel tank. UAE MOD confirmed air defence systems were responding to incoming missile and drone threats from Iran on Monday.',
+    news:[
+      {dot:'r', text:'Abu Dhabi Media Office: "authorities responded to an incident in the Al Bahia area involving a missile strike on a civilian vehicle, resulting in the death of one Palestinian national."', time:'Morning GST · 16 Mar · @ADMediaOffice'},
+      {dot:'b', text:'Times of Israel: Palestinian civilian killed on outskirts of Abu Dhabi when missile hit their car, as Iran continued striking the Gulf.', time:'16 Mar · Times of Israel / AFP'},
+    ],
+    links:[
+      {label:'Times of Israel — Missile strike kills Palestinian civilian in Abu Dhabi', url:'https://www.timesofisrael.com/liveblog_entry/missile-strike-kills-palestinian-civilian-in-abu-dhabi-authorities-say/'},
+      {label:'Khaleej Times — One dead after missile falls on vehicle Al Bahia', url:'https://www.khaleejtimes.com/uae/abu-dhabi-confirms-one-dead-missile-falls-vehicle-al-bahia'},
+      {label:'The National — One person killed in Abu Dhabi after missile attack', url:'https://www.thenationalnews.com/news/mena/2026/03/16/live-us-israel-iran-war-dubai-airport/'},
+    ],
+  },
+
+  // ══ 15 MARCH (Sunday) ═════════════════════════════════════════════
+  // UAE MOD confirmed: 4 BM + 6 drones intercepted on 15 Mar. Cumulative: 298 BM, 15 CM, 1,606 drones.
+  // NCEMA shelter alert issued Sunday morning. No confirmed ground strikes in UAE reported.
+
+  // ══ 14 MARCH (Saturday) ═══════════════════════════════════════════
+  // UAE MOD confirmed: 9 BM + 33 drones intercepted on 14 Mar. Cumulative: 294 BM, 15 CM, 1,600 drones.
+  // 6 deaths, 141 injured as of this MOD statement.
+  // Key incidents: Fujairah oil hub debris fire (1 Jordanian lightly injured, oil loading suspended);
+  // Dubai central building facade debris (no injuries).
+  {
+    id:'FUJ14MAR_OILHUB', day:'14mar', emirate:'Fujairah', sc:'a', type:'debris',
+    lat:25.1213, lon:56.3367,
+    name:'Fujairah Oil Hub — Interception Debris Fire, Oil Loading Suspended',
+    area:'Fujairah Free Zone / Bunkering Hub, Fujairah',
+    time:'Daytime GST · 14 Mar',
+    status:'Debris impact — fire, 1 injured, oil loading suspended', strikes:0,
+    weapon:'Interception debris (from intercepted drone)', cas:'1 lightly injured: Jordanian national', dmg:'Debris from a successful drone interception fell on the Fujairah oil bunkering hub, triggering a significant fire. Civil defence deployed to contain the blaze. Some oil-loading operations suspended. Fujairah is outlet for ~1 million bpd of UAE Murban crude and key global bunkering hub. Operations resumed the following day.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:0,
+    desc:'On Saturday 14 March, debris from a successfully intercepted drone fell on the Fujairah oil bunkering hub, triggering a significant fire at the major energy installation. The Fujairah Media Office confirmed the incident, stating that debris from the interception fell in the area and caused the fire. One Jordanian citizen was lightly injured in the incident. Civil defence forces deployed to contain the blaze. In the aftermath, some oil-loading operations were suspended at the port, which is a key crude export terminal handling around 1 million barrels per day of Murban crude — the UAE\'s only export route while the Strait of Hormuz remains disrupted. The incident occurred hours after the US struck Iran\'s Kharg Island oil hub. Iran\'s IRGC had warned that US interests in UAE ports and docks were legitimate targets. Oil loading operations were reported to have resumed by Sunday 15 March. Smoke was visible from Fujairah for several hours.',
+    news:[
+      {dot:'a', text:'Fujairah Media Office: debris from successful drone interception caused fire at major bunkering hub. Civil defence deployed. 1 Jordanian lightly injured.', time:'14 Mar · @FujairahMedia / Al Jazeera'},
+      {dot:'r', text:'Reuters/Bloomberg: some oil-loading operations at Fujairah suspended after drone fire. Fujairah is outlet for ~1m bpd of UAE Murban crude.', time:'14 Mar · Reuters / Bloomberg'},
+      {dot:'b', text:'CNBC / Reuters: oil loading operations at Fujairah resume, per unidentified industry sources.', time:'15 Mar · CNBC / Reuters'},
+    ],
+    links:[
+      {label:'Reuters — UAE Fujairah stops oil loading after drone attack', url:'https://www.usnews.com/news/world/articles/2026-03-14/fire-occurred-in-uaes-fujairah-after-debris-fell-during-interception-of-drone-no-injuries-reported-media-office-says'},
+      {label:'Bloomberg — Fujairah oil operations suspended after drone attack', url:'https://www.bloomberg.com/news/articles/2026-03-14/some-fujairah-oil-operations-suspended-after-drone-attack-fire'},
+      {label:'Al Jazeera — Iran continues intensified attacks across Gulf', url:'https://www.aljazeera.com/news/2026/3/14/iran-continues-intensified-attacks-across-gulf-in-us-israel-war-fallout'},
+      {label:'CNBC — Oil loading resumes at Fujairah', url:'https://www.cnbc.com/2026/03/15/oil-loading-operations-at-ua.html'},
+    ],
+  },
+  {
+    id:'DXB14MAR_CENTRAL', day:'14mar', emirate:'Dubai', sc:'p', type:'debris',
+    lat:25.2200, lon:55.2800,
+    name:'Central Dubai — Interception Debris Hits Building Facade',
+    area:'Central Dubai',
+    time:'Daytime GST · 14 Mar',
+    status:'Debris impact — no injuries', strikes:0,
+    weapon:'Interception debris (from intercepted aerial threat)', cas:'None — no injuries reported', dmg:'Debris from a successful interception fell on the facade of a building in central Dubai. Minor exterior damage. No fire.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:0,
+    desc:'On Saturday 14 March, the Dubai Media Office confirmed that falling debris from a successful interception had struck the facade of a building in central Dubai. Authorities stated that no fire occurred and no injuries were reported, and the situation was contained. The statement did not specify whether the intercepted threat was a missile or a drone. The incident was one of two UAE-wide ground impacts confirmed on 14 March, the other being the Fujairah oil hub fire.',
+    news:[
+      {dot:'p', text:'Dubai Media Office: falling debris from successful interception caused minor incident on facade of building in central Dubai. No fire, no injuries. Situation contained.', time:'14 Mar · @DXBMediaOffice / Al Jazeera'},
+    ],
+    links:[
+      {label:'Al Jazeera — Iran continues intensified attacks across Gulf (14 Mar)', url:'https://www.aljazeera.com/news/2026/3/14/iran-continues-intensified-attacks-across-gulf-in-us-israel-war-fallout'},
+    ],
+  },
+
+  // ══ 13 MARCH (Friday) ════════════════════════════════════════════
+  // Friday 13 Mar: DIFC building hit by interception debris. AFP reporter on scene: huge double
+  // blast, large black smoke cloud over central Dubai. Dubai Media Office confirmed. No injuries.
+  // UAE MOD daily figures for 13 Mar not yet published.
+  {
+    id:'DXB13MAR_DIFC', day:'13mar', emirate:'Dubai', sc:'p', type:'debris',
+    lat:25.2176, lon:55.2802,
+    name:'DIFC — Interception Debris Hits Building, Black Smoke Over Central Dubai',
+    area:'Dubai International Financial Centre (DIFC), Dubai',
+    time:'Morning GST · 13 Mar',
+    status:'Debris impact — no injuries', strikes:0,
+    weapon:'Interception debris (from intercepted aerial threat)', cas:'None — no injuries reported', dmg:'Debris from a successful interception caused a minor incident on the facade of a building in the DIFC district. Large cloud of black smoke seen over central Dubai. AFP correspondent reported a "huge double blast" that rattled buildings. Police cordoned off area.', rate:'—',
+    mwave:null, mstruck:0, dwave:null, dstruck:0,
+    desc:'On Friday morning 13 March, large explosions shook central Dubai and thick black smoke rose over the skyline near the Dubai International Financial Centre (DIFC). An AFP correspondent on the ground reported hearing a "huge double blast" that rattled nearby buildings and left a large plume of black smoke hanging over the area. The Dubai Media Office confirmed that debris from a successful interception had caused a minor incident on the facade of a building in central Dubai, with no injuries reported. Police cordoned off the affected area. The incident follows three similar drone and debris incidents in Dubai on Thursday 12 March (Address Creek Harbour, Al Bada\'a, Sheikh Zayed Road). Iran had previously threatened to begin targeting economic institutions and financial infrastructure linked to the US and its allies, prompting some companies in the DIFC area to evacuate staff as a precaution. Sirens were heard in the direction of Sheikh Zayed Road before the explosions.',
+    news:[
+      {dot:'p', text:'Dubai Media Office: "debris from a successful interception caused a minor incident on the facade of a building in central Dubai. No injuries reported."', time:'13 Mar · @DXBMediaOffice'},
+      {dot:'b', text:'AFP correspondent: "huge double blast rattled buildings, large cloud of black smoke hanging over central Dubai area."', time:'13 Mar · AFP'},
+      {dot:'b', text:'Incident located at DIFC, Dubai\'s main financial district. Police cordon established. Companies in area had evacuated staff following Iran\'s threats to target economic institutions.', time:'13 Mar · AFP / Republic World / India Today'},
+    ],
+    links:[
+      {label:'Times of India — Dubai targeted again, black smoke financial hub', url:'https://timesofindia.indiatimes.com/world/middle-east/dubai-targeted-again-video-shows-thick-black-smoke-after-blasts-rock-financial-hub-debris-hits-building/articleshow/129537033.cms'},
+      {label:'Times of Israel — Dubai building hit by debris from intercepted attack', url:'https://www.timesofisrael.com/liveblog_entry/dubai-says-building-hit-by-debris-from-intercepted-attack/'},
+      {label:'FMT — Blasts heard, smoke seen over central Dubai', url:'https://www.freemalaysiatoday.com/category/world/2026/03/13/blasts-heard-smoke-seen-over-central-dubai'},
+      {label:'NewsX — DIFC building hit, sirens near Sheikh Zayed Road', url:'https://www.newsx.com/world/dubai-uae-abu-dhabi-iran-israel-us-war-news-live-updates-difc-dubai-building-international-airport-middle-east-war-sheikh-zayed-road-middle-east-war-182025/'},
+    ],
+  },
+
+  // ══ 12 MARCH (Thursday) ══════════════════════════════════════════
+  // UAE MOD confirmed: 10 BM + 26 drones intercepted/engaged on 12 Mar (Thursday).
+  // Cumulative through 12 Mar: 278 BM, 15 CM, 1,540 drones (UAE MOD via WAM).
+  // 3 confirmed Dubai incidents: Creek Harbour (drone fall, 02:45), Al Bada'a (drone crash, ~12:22), SZR debris (~12:55).
+  // No per-type missile/drone breakdown published — only confirmed intercepted counts.
+  {
+    id:'DXB12MAR_CREEKHARBOUR', day:'12mar', emirate:'Dubai', sc:'p', type:'drone',
     lat:25.2010, lon:55.3667,
     name:'Address Creek Harbour 2 — Drone Strike, Apartment Fire',
     area:'Dubai Creek Harbour, Dubai',
-    time:'02:45 GST · 13 Mar',
+    time:'02:45 GST · 12 Mar',
     status:'Drone fell — minor fire, no injuries', strikes:1,
     weapon:'Iranian drone (Shahed-type — fell)', cas:'None — no injuries reported', dmg:'Section of Address Creek Harbour 2 tower caught fire. Blaze contained to one or two apartments. Debris fell to street below. Building evacuated as precaution.', rate:'—',
     mwave:null, mstruck:0, dwave:null, dstruck:1,
     desc:'In the early hours of Thursday 13 March, a drone fell on the Address Creek Harbour 2 residential tower at approximately 02:45 GST. A minor fire broke out, visibly contained to one or two apartments based on social media footage. Civil Defence teams quickly extinguished the blaze. The building was evacuated as a precaution; residents sheltered in the basement car park. No injuries were reported. The Dubai Government Media Office confirmed the incident, saying the situation was "under control" and "all residents are safe." Images showed fire damage to the facade and debris on the street below. The UAE MOD confirmed 10 ballistic missiles and 26 drones were engaged UAE-wide on 13 March.',
     news:[
-      {dot:'p', text:'Address Creek Harbour 2 struck by drone at 02:45 GST. Minor fire, evacuated, no injuries. Civil Defence confirm situation under control.', time:'02:45 GST · 13 Mar · Dubai Government Media Office'},
-      {dot:'b', text:'Social media footage shows fire contained to one or two apartments; debris on street below. Residents shelter in basement car park.', time:'13 Mar · Flightradar24 / social media'},
-      {dot:'b', text:'UAE MOD: 10 BM + 26 drones engaged UAE-wide on 13 Mar. Cumulative: 278 BM, 15 CM, 1,540 drones since 28 Feb.', time:'13 Mar · @modgovae / WAM'},
+      {dot:'p', text:'Address Creek Harbour 2 struck by drone at 02:45 GST. Minor fire, evacuated, no injuries. Civil Defence confirm situation under control.', time:'02:45 GST · 12 Mar · Dubai Government Media Office'},
+      {dot:'b', text:'Social media footage shows fire contained to one or two apartments; debris on street below. Residents shelter in basement car park.', time:'12 Mar · Flightradar24 / social media'},
+      {dot:'b', text:'UAE MOD: 10 BM + 26 drones engaged UAE-wide on 13 Mar. Cumulative: 278 BM, 15 CM, 1,540 drones since 28 Feb.', time:'12 Mar · @modgovae / WAM'},
     ],
     links:[
       {label:'The National — Dubai spate of drone incidents 13 Mar', url:'https://www.thenationalnews.com/news/uae/2026/03/12/fire-put-out-after-iranian-drone-slams-into-dubai-residential-tower/'},
@@ -697,17 +827,17 @@ const INCIDENTS = [
     ],
   },
   {
-    id:'DXB13MAR_BADAA', day:'13mar', emirate:'Dubai', sc:'p', type:'drone',
+    id:'DXB12MAR_BADAA', day:'12mar', emirate:'Dubai', sc:'p', type:'drone',
     lat:25.2350, lon:55.2900,
     name:'Al Bada\'a — Drone Crash, No Injuries',
     area:'Al Bada\'a, Dubai',
-    time:'~12:22 GST · 13 Mar',
+    time:'~12:22 GST · 12 Mar',
     status:'Drone fell — no injuries', strikes:1,
     weapon:'Iranian drone (fell — not intercepted)', cas:'None — no injuries reported', dmg:'Minor — drone fell in Al Bada\'a residential/commercial area. Relevant teams handled incident.', rate:'—',
     mwave:null, mstruck:0, dwave:null, dstruck:1,
-    desc:'Dubai authorities reported responding to a minor incident involving a drone crash in the Al Bada\'a area of Dubai at approximately 12:22 GST on Thursday 13 March. Officials confirmed no injuries were reported. Relevant emergency teams assessed and handled the situation. The Al Bada\'a district sits between Jumeirah and the World Trade Centre area, near Dubai city centre. The incident was one of three confirmed drone impacts in Dubai on 13 March, the others being the earlier Address Creek Harbour 2 building fire and a debris impact on Sheikh Zayed Road.',
+    desc:'Dubai authorities reported responding to a minor incident involving a drone crash in the Al Bada\'a area of Dubai at approximately 12:22 GST on Thursday 12 March. Officials confirmed no injuries were reported. Relevant emergency teams assessed and handled the situation. The Al Bada\'a district sits between Jumeirah and the World Trade Centre area, near Dubai city centre. The incident was one of three confirmed drone impacts in Dubai on 13 March, the others being the earlier Address Creek Harbour 2 building fire and a debris impact on Sheikh Zayed Road.',
     news:[
-      {dot:'p', text:'Dubai authorities responding to minor incident: drone crash in Al Bada\'a area. No injuries reported.', time:'~12:22 GST · 13 Mar · Dubai Government Media Office / Gulf News'},
+      {dot:'p', text:'Dubai authorities responding to minor incident: drone crash in Al Bada\'a area. No injuries reported.', time:'~12:22 GST · 12 Mar · Dubai Government Media Office / Gulf News'},
     ],
     links:[
       {label:'Gulf News — Day 13 live blog (Al Bada\'a incident)', url:'https://gulfnews.com/uae/us-israel-war-on-iran-day-13-iran-hits-gulf-countries-minor-drone-incidents-in-dubai-1.500471643'},
@@ -715,17 +845,17 @@ const INCIDENTS = [
     ],
   },
   {
-    id:'DXB13MAR_SZR', day:'13mar', emirate:'Dubai', sc:'p', type:'debris',
+    id:'DXB12MAR_SZR', day:'12mar', emirate:'Dubai', sc:'p', type:'debris',
     lat:25.2175, lon:55.2830,
     name:'Sheikh Zayed Road — Interception Debris Hits Tower Facade',
     area:'Sheikh Zayed Road, Dubai',
-    time:'~12:55 GST · 13 Mar',
+    time:'~12:55 GST · 12 Mar',
     status:'Debris impact — no injuries', strikes:0,
     weapon:'Interception debris (from intercepted drone/missile)', cas:'None — no injuries reported', dmg:'Debris from a successful interception fell onto the facade of a building on Sheikh Zayed Road. Minor structural damage to exterior.', rate:'—',
     mwave:null, mstruck:0, dwave:null, dstruck:0,
-    desc:'At approximately 12:55 GST on Thursday 13 March, Dubai authorities announced they were responding to a minor incident caused by debris from a successful air defence interception that fell onto the facade of a building on Sheikh Zayed Road. No injuries were reported. This type of debris impact — from intercepted rather than fallen projectiles — has been a recurring pattern throughout the campaign, with the UAE government consistently reminding residents that interception debris can cause localised damage without constituting a direct strike. Sheikh Zayed Road is Dubai\'s main arterial highway lined with skyscrapers, hotels and commercial towers.',
+    desc:'At approximately 12:55 GST on Thursday 12 March, Dubai authorities announced they were responding to a minor incident caused by debris from a successful air defence interception that fell onto the facade of a building on Sheikh Zayed Road. No injuries were reported. This type of debris impact — from intercepted rather than fallen projectiles — has been a recurring pattern throughout the campaign, with the UAE government consistently reminding residents that interception debris can cause localised damage without constituting a direct strike. Sheikh Zayed Road is Dubai\'s main arterial highway lined with skyscrapers, hotels and commercial towers.',
     news:[
-      {dot:'p', text:'Dubai authorities responding to minor incident: debris from successful interception falls on Sheikh Zayed Road tower facade. No injuries.', time:'~12:55 GST · 13 Mar · Dubai Government Media Office / Gulf News'},
+      {dot:'p', text:'Dubai authorities responding to minor incident: debris from successful interception falls on Sheikh Zayed Road tower facade. No injuries.', time:'~12:55 GST · 12 Mar · Dubai Government Media Office / Gulf News'},
     ],
     links:[
       {label:'Gulf News — Day 13 live blog (SZR debris)', url:'https://gulfnews.com/uae/us-israel-war-on-iran-day-13-iran-hits-gulf-countries-minor-drone-incidents-in-dubai-1.500471643'},
@@ -1540,7 +1670,7 @@ function mkPopup(inc) {
 ${linksHtml}
 <div class="pu-foot">
   <span>${inc.lat.toFixed(4)}°N ${inc.lon.toFixed(4)}°E · ${inc.emirate}</span>
-  <span>AKE International · 13 Mar 2026</span>
+  <span>AKE International · 16 Mar 2026</span>
 </div>
 </div>`;
 }
@@ -1616,28 +1746,44 @@ function setTF(el, type) {
 function updateStats() {
   const s = DAILY[activeDay] || DAILY.all;
   const na = v => (v === null || v === undefined);
-  const fmt = v => na(v) ? '—' : v.toLocaleString();
-  // Only include non-null values in totals / rate
-  const tl = (na(s.ml)?0:s.ml) + (na(s.dl)?0:s.dl);
-  const ti = (na(s.mi)?0:s.mi) + (na(s.di)?0:s.di);
+  const p = s.minOnly ? '+' : '';                        // '+' suffix when counts are minimums
+  const fmt  = v => na(v) ? '—' : v.toLocaleString();
+  const fmtp = v => na(v) ? '—' : v.toLocaleString() + p;
+  // Totals — include cruise missiles (cm) in missile count if present
+  const tl = (na(s.ml)?0:s.ml) + (na(s.cm)?0:s.cm) + (na(s.dl)?0:s.dl);
+  const ti = (na(s.mi)?0:s.mi) + (na(s.cm_i)?0:s.cm_i) + (na(s.di)?0:s.di);
   const ts = (na(s.ms)?0:s.ms) + (na(s.ds)?0:s.ds);
-  const knownTotal = (!na(s.ml)||!na(s.dl)) && tl > 0;
-  const rate = knownTotal ? Math.round(ti/tl*100) : null;
+  const knownFired = !na(s.ml) || !na(s.dl);
+  // Rate: frozen for all-days view; calculated only when full fired counts known (no minOnly)
+  let rate = null;
+  if (!na(s.frozenRate)) {
+    rate = s.frozenRate;
+  } else if (!s.minOnly && !na(s.ml) && !na(s.dl) && tl > 0) {
+    rate = Math.round(ti/tl*100);
+  }
   // Header chips
-  document.getElementById('tot-launched').textContent = na(s.ml)&&na(s.dl) ? '—' : tl.toLocaleString();
-  document.getElementById('tot-missiles').textContent = fmt(s.ml);
-  document.getElementById('tot-drones').textContent   = fmt(s.dl);
-  document.getElementById('tot-struck').textContent   = ts;
+  document.getElementById('tot-launched').textContent = knownFired ? tl.toLocaleString()+p : '—';
+  document.getElementById('tot-missiles').textContent = fmtp(na(s.cm) ? s.ml : (na(s.ml)?0:s.ml)+(na(s.cm)?0:s.cm));
+  document.getElementById('tot-drones').textContent   = fmtp(s.dl);
+  document.getElementById('tot-struck').textContent   = ts+p;
   document.getElementById('tot-int').textContent      = na(rate) ? '—' : rate+'%';
   // Sidebar stats
-  document.getElementById('sg-m').textContent  = fmt(s.ml);
-  document.getElementById('sg-mi').textContent = fmt(s.mi)+' intercept.';
-  document.getElementById('sg-ms').textContent = fmt(s.ms)+' struck';
-  document.getElementById('sg-d').textContent  = fmt(s.dl);
-  document.getElementById('sg-di').textContent = fmt(s.di)+' intercept.';
-  document.getElementById('sg-ds').textContent = fmt(s.ds)+' struck';
+  document.getElementById('sg-m').textContent  = fmtp(na(s.cm) ? s.ml : (na(s.ml)?0:s.ml)+(na(s.cm)?0:s.cm));
+  document.getElementById('sg-mi').textContent = fmt(s.mi) + (na(s.cm_i)?'':'+'+s.cm_i+' CM') + ' intercept.';
+  document.getElementById('sg-ms').textContent = fmt(s.ms)+p+' struck';
+  document.getElementById('sg-d').textContent  = fmtp(s.dl);
+  document.getElementById('sg-di').textContent = fmtp(s.di)+' intercept.';
+  document.getElementById('sg-ds').textContent = fmt(s.ds)+p+' struck';
   document.getElementById('sg-r').textContent  = na(rate) ? '—' : rate+'%';
-  document.getElementById('sg-rs').textContent = knownTotal ? ti.toLocaleString()+' / '+tl.toLocaleString()+' neutralised' : 'breakdown not yet published';
+  if (!na(s.frozenRate)) {
+    document.getElementById('sg-rs').textContent = 'rate frozen at 10 Mar (total fired unknown 11 Mar+)';
+  } else if (!s.minOnly && !na(s.ml) && !na(s.dl) && tl > 0) {
+    document.getElementById('sg-rs').textContent = ti.toLocaleString()+' / '+tl.toLocaleString()+' neutralised';
+  } else if (s.minOnly) {
+    document.getElementById('sg-rs').textContent = 'minimum confirmed — actual total higher';
+  } else {
+    document.getElementById('sg-rs').textContent = 'total fired not yet published';
+  }
   document.getElementById('sg-i').textContent  = s.inc;
   document.getElementById('sg-is').textContent = 'confirmed UAE incidents';
 }
