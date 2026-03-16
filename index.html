@@ -449,6 +449,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
       <button class="msb"        id="msb-light"  onclick="setMapStyle('light')">☀ Light</button>
       <button class="msb active" id="msb-dark"   onclick="setMapStyle('dark')">🌑 Dark</button>
       <button class="msb"        id="msb-street" onclick="setMapStyle('street')">🗺 Street</button>
+      <button class="msb"        id="msb-osm"    onclick="setMapStyle('osm')">◻ Positron</button>
     </div>
     <span id="hts">—</span>
   </div>
@@ -1557,6 +1558,9 @@ const cartoDark = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x
 // Street: Esri World Street Map — English globally, reliable in Gulf
 const osmStreet = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
   { attribution:'© Esri © OpenStreetMap contributors', maxZoom:19 });
+// Positron: CartoDB Positron — minimal, clean, English labels globally
+const osmStandard = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  { attribution:'© OpenStreetMap © CARTO', subdomains:'abcd', maxZoom:20 });
 
 cartoDark.addTo(map);   // DEFAULT = dark
 document.body.classList.add('dark-map');
@@ -1571,10 +1575,11 @@ const MKR = {};
 // ── Map style switcher ──
 let currentStyle = 'light';
 function setMapStyle(style) {
-  [cartoLight, cartoDark, osmStreet].forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
-  if (style === 'light')  { cartoLight.addTo(map); document.body.classList.remove('dark-map'); }
-  if (style === 'dark')   { cartoDark.addTo(map);  document.body.classList.add('dark-map'); }
-  if (style === 'street') { osmStreet.addTo(map);  document.body.classList.remove('dark-map'); }
+  [cartoLight, cartoDark, osmStreet, osmStandard].forEach(l => { if (map.hasLayer(l)) map.removeLayer(l); });
+  if (style === 'light')    { cartoLight.addTo(map);    document.body.classList.remove('dark-map'); }
+  if (style === 'dark')     { cartoDark.addTo(map);     document.body.classList.add('dark-map'); }
+  if (style === 'street')   { osmStreet.addTo(map);     document.body.classList.remove('dark-map'); }
+  if (style === 'osm')      { osmStandard.addTo(map);   document.body.classList.remove('dark-map'); }
   currentStyle = style;
   document.querySelectorAll('.msb').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('msb-'+style);
