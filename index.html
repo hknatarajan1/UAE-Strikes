@@ -435,6 +435,40 @@ body.dark-map .pu-cell-v.g{color:#4ade80;}
 body.dark-map .pu-link{background:rgba(96,165,250,0.1);border-color:rgba(96,165,250,0.25);color:#93c5fd;}
 body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
 .pu-link-icon{font-size:9px;opacity:.7;}
+/* ── LIST VIEW TABS ── */
+.list-view-tabs{display:flex;gap:0;flex:1;}
+.lvtab{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;padding:3px 8px 3px 0;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.lvtab.active{color:var(--ake1);border-bottom-color:var(--ake1);}
+.lvtab:hover:not(.active){color:var(--text);}
+
+/* ── ALERT FEED ── */
+#alert-feed{flex:1;overflow-y:auto;padding:4px 0 40px;}
+.af-day{margin-bottom:4px;}
+.af-day-hdr{display:flex;align-items:center;gap:6px;padding:6px 12px 5px;position:sticky;top:0;background:var(--panel);z-index:2;border-bottom:1px solid var(--border);border-top:2px solid var(--ake1);}
+.af-day-label{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--text);}
+.af-day-count{font-size:9px;color:var(--muted);margin-left:auto;font-family:var(--mono);}
+.af-alert{display:flex;gap:8px;padding:6px 12px 6px 14px;border-left:3px solid transparent;cursor:default;border-bottom:1px solid var(--border);}
+.af-alert:hover{background:var(--border);}
+.af-alert.red{border-left-color:#ef4444;background:rgba(239,68,68,0.04);}
+.af-alert.amber{border-left-color:#f59e0b;background:rgba(245,158,11,0.04);}
+.af-alert.green{border-left-color:#22c55e;background:rgba(34,197,94,0.04);}
+.af-alert.blue{border-left-color:#3b82f6;background:rgba(59,130,246,0.04);}
+.af-time{font-size:10px;font-family:var(--mono);color:var(--muted);min-width:42px;padding-top:1px;flex-shrink:0;font-weight:600;}
+.af-body{flex:1;}
+.af-type{font-size:9.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.af-type.missile{color:#dc2626;}
+.af-type.drone{color:#d97706;}
+.af-type.allclear{color:#16a34a;}
+.af-type.info{color:#2563eb;}
+.af-type.mixed{color:#7c3aed;}
+.af-desc{font-size:11.5px;color:var(--text);line-height:1.5;font-weight:500;}
+.af-src{font-size:9px;color:var(--muted);margin-top:3px;font-style:italic;}
+.af-day-pills{display:flex;gap:4px;flex-wrap:wrap;padding:3px 12px 5px;}
+.af-pill{font-size:9px;padding:2px 7px;border-radius:3px;font-weight:700;}
+.af-pill.m{background:rgba(220,38,38,0.12);color:#dc2626;border:1px solid rgba(220,38,38,0.25);}
+.af-pill.d{background:rgba(217,119,6,0.12);color:#d97706;border:1px solid rgba(217,119,6,0.25);}
+.af-pill.s{background:rgba(220,38,38,0.18);color:#dc2626;border:1px solid rgba(220,38,38,0.3);}
+</style> */
 </style>
 </head>
 <body>
@@ -529,13 +563,17 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
     <div class="atab" onclick="setAF(this,'military')">🎖 Military</div>
   </div>
 
-  <!-- Incident list -->
+  <!-- Incident list / Alert feed toggle -->
   <div class="list-hdr">
-    <span class="list-hdr-lbl">⚡ Incidents — latest first</span>
-    <span class="scroll-hint"><span class="scroll-arrow">↓</span> scroll</span>
+    <div class="list-view-tabs">
+      <span class="lvtab" id="lvt-inc" onclick="setListView('incidents')">⚡ Incidents</span>
+      <span class="lvtab active" id="lvt-alerts" onclick="setListView('alerts')">🚨 Alert Feed</span>
+    </div>
+    <span class="scroll-hint" id="tz-hint" style="font-size:8px;color:var(--muted);font-family:var(--mono);">All times GST (UTC+4)</span>
   </div>
   <div class="alist-wrap">
-    <div id="alist"></div>
+    <div id="alist" style="display:none"></div>
+    <div id="alert-feed"></div>
   </div>
 </div>
 
@@ -1713,6 +1751,7 @@ function setDay(day) {
   buildList();
   updateStats();
   map.closePopup();
+  if (activeListView === 'alerts') buildAlertFeed();
 }
 
 // ── Marker icon ──
@@ -1935,12 +1974,205 @@ function manualRefresh(){ doRefresh(); startTimer(); }
 buildDateBar();
 buildMarkers();
 buildList();
+buildAlertFeed();
 updateStats();
 tick();
 startTimer();
 setInterval(tick,1000);
 // Fit to all UAE
 map.fitBounds([[22.6, 51.5],[26.1, 56.4]], {padding:[22,22]});
+</script>
+
+
+<script>
+// ══ ALERT FEED DATA ══
+// Source: NCEMA (UAE National Crisis and Emergency Management Authority),
+// UAE MOD statements, Al Jazeera live blogs, Gulf News, The National
+// All times GST (Gulf Standard Time = UTC+4) where known
+const ALERT_FEED = [
+  // ══════════════════════════════════════════════════════════════════
+  // UAE NCEMA / MOI / MOD ALERT LOG — 28 Feb – 17 Mar 2026
+  // All times in GST (Gulf Standard Time = UTC+4), which is the
+  // official time zone used by UAE authorities in all public alerts.
+  // Times marked with * are exact as published by the named source.
+  // Times marked with ~ are approximate based on reporting context.
+  // Sources: NCEMA @NCEMAUAE, MOI @moiuae, MOD @modgovae,
+  //          ARN News Centre, The National, Time Out Dubai,
+  //          Gulf News, Dubai Eye 103.8, US Embassy UAE
+  // ══════════════════════════════════════════════════════════════════
+
+  { day:'17mar', label:'17 Mar — Tuesday (Day 17)', alerts:[
+    { time:'~02:00',  type:'missile',  level:'red',   desc:'NCEMA / MOI alert — missile and drone threat incoming over Abu Dhabi and Fujairah. Air defence systems responding.', src:'NCEMA / MOI' },
+    { time:'~02:30',  type:'allclear', level:'green', desc:'All-clear issued. Interceptions confirmed. Shrapnel from intercepted BM falls in Baniyas, Abu Dhabi — 1 Pakistani national killed (8th fatality of campaign).', src:'Abu Dhabi Media Office' },
+    { time:'~05:30',  type:'drone',    level:'amber', desc:'Fujairah alert — drone strike on Fujairah Oil Industry Zone (FOIZ). Fire breaks out; Civil Defence deployed. No injuries.', src:'Fujairah Media Office / WAM' },
+    { time:'~06:00',  type:'allclear', level:'green', desc:'All-clear issued, Fujairah. UAE MOD end-of-day statement for 17 Mar pending at time of last update.', src:'NCEMA' },
+  ]},
+
+  { day:'16mar', label:'16 Mar — Monday (Day 16)', alerts:[
+    { time:'~02:00',  type:'drone',    level:'amber', desc:'MOI / NCEMA alert — drone threat over Dubai. Iranian drone strikes fuel tank near Dubai International Airport (DXB). Massive fire breaks out.', src:'Dubai Media Office / NCEMA' },
+    { time:'06:30*',  type:'info',     level:'blue',  desc:'Dubai Civil Aviation Authority suspends all DXB flights. Emirates cancels all services; inbound flights diverted to Al Maktoum (DWC). Longest DXB closure of the campaign (7+ hours).', src:'DCAA / @DXBMediaOffice' },
+    { time:'~07:15',  type:'missile',  level:'red',   desc:'Abu Dhabi NCEMA alert — missile falls on civilian vehicle in Al Bahia. 1 Palestinian national killed. US Embassy UAE issues March 16 security alert.', src:'Abu Dhabi Media Office / US Embassy UAE' },
+    { time:'~09:00',  type:'drone',    level:'amber', desc:'Fujairah alert — drone strikes FOIZ directly. Large fire; oil loading suspended.', src:'Fujairah Media Office' },
+    { time:'~10:00',  type:'drone',    level:'amber', desc:'Abu Dhabi remote alert — drone strikes Shah oil & gas field (~230km SW). Fire; ADNOC suspends operations.', src:'Abu Dhabi Media Office / ADNOC' },
+    { time:'10:00*',  type:'allclear', level:'green', desc:'DXB limited operations resume. UAE MOD confirms: 4 BM destroyed, 6 drones destroyed on 16 Mar.', src:'Emirates / UAE MOD' },
+    { time:'~11:00',  type:'allclear', level:'green', desc:'All-clear for Abu Dhabi and Fujairah.', src:'NCEMA' },
+  ]},
+
+  { day:'15mar', label:'15 Mar — Sunday (Day 15)', alerts:[
+    { time:'~02:00',  type:'missile',  level:'red',   desc:'MOI issues nationwide alert in early hours — "credible missile threat." Residents advised to defer travel and limit movement.', src:'UAE MOI / visahq.com' },
+    { time:'~03:00',  type:'allclear', level:'green', desc:'All-clear issued. 4 BM + 6 drones detected; all intercepted. Zero ground strikes — no casualties on 15 Mar.', src:'UAE MOD / NCEMA' },
+  ]},
+
+  { day:'14mar', label:'14 Mar — Saturday (Day 14)', alerts:[
+    { time:'morning', type:'mixed',    level:'red',   desc:'NCEMA alert — 9 BM + 33 drones detected. All 9 missiles intercepted. Interception debris falls on Fujairah oil hub — fire, 1 Jordanian national lightly injured. Debris hits building facade in Central Dubai, no injuries.', src:'UAE MOD / Fujairah Media Office / Dubai Media Office' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear issued. US Embassy issues shelter-in-place advisory (March 14 security alert) for all US government employees.', src:'NCEMA / US Embassy UAE' },
+  ]},
+
+  { day:'13mar', label:'13 Mar — Friday (Day 13)', alerts:[
+    { time:'07:34*',  type:'info',     level:'blue',  desc:'Dubai Media Office confirms debris fell on facade of central Dubai building — "minor incident." No injuries.', src:'Dubai Media Office / The National' },
+    { time:'08:15*',  type:'mixed',    level:'red',   desc:'MOI / NCEMA Alert 1 — "immediately seek a safe place." Stay away from windows, doors and open areas. Potential missile threat. Abu Dhabi and Dubai.', src:'MOI / The National' },
+    { time:'08:40*',  type:'allclear', level:'green', desc:'All-clear 1 — "situation is safe, resume activities with caution." 7 BM + 27 drones dealt with on 13 Mar (all intercepted).', src:'NCEMA / The National / Dubai Eye 103.8' },
+    { time:'17:49*',  type:'missile',  level:'red',   desc:'NCEMA Alert 2 — second missile threat. Air defence responding. Abu Dhabi and Dubai alerts issued.', src:'NCEMA @NCEMAUAE / Dubai Eye 103.8' },
+    { time:'18:12*',  type:'allclear', level:'green', desc:'All-clear 2 — "situation is currently safe." Resume normal activities, remain cautious.', src:'NCEMA / Dubai Eye 103.8' },
+  ]},
+
+  { day:'12mar', label:'12 Mar — Thursday (Day 12)', alerts:[
+    { time:'~02:45',  type:'drone',    level:'amber', desc:'Dubai alert — drone falls on Address Creek Harbour 2 residential tower. Minor apartment fire; building evacuated.', src:'Dubai Media Office' },
+    { time:'~12:22',  type:'drone',    level:'amber', desc:'Dubai alert — drone crash in Al Bada\'a area. No injuries.', src:'Dubai Media Office' },
+    { time:'~12:55',  type:'missile',  level:'red',   desc:'Dubai alert — interception debris hits Sheikh Zayed Road tower facade. No injuries. NCEMA alert issued.', src:'Dubai Media Office / NCEMA' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. UAE MOD: 10 missiles (all intercepted) + 26 drones (some fell inside UAE). Running total: 233 BM + 1,359 drones intercepted since 28 Feb.', src:'UAE MOD / The National' },
+  ]},
+
+  { day:'11mar', label:'11 Mar — Wednesday (Day 11)', alerts:[
+    { time:'~01:00',  type:'drone',    level:'amber', desc:'Dubai NCEMA alert — drone threat shortly after 1am. Two Iranian drones fall near Dubai International Airport; 4 workers injured.', src:'Time Out Dubai / Dubai Media Office' },
+    { time:'01:40*',  type:'allclear', level:'green', desc:'All-clear at ~01:40. DXB takeoffs briefly paused; Emirates arrivals held in holding pattern over Oman. Normal operations resume.', src:'Time Out Dubai' },
+    { time:'evening', type:'missile',  level:'red',   desc:'Abu Dhabi evening alert — debris fire at Bateen/old airport area from intercepted missiles.', src:'Abu Dhabi Media Office / NCEMA' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. UAE MOD: 6 BM + 7 cruise missiles (all intercepted); 39 drones (some fell inside UAE).', src:'UAE MOD' },
+  ]},
+
+  { day:'10mar', label:'10 Mar — Monday (Day 10)', alerts:[
+    { time:'08:15*',  type:'mixed',    level:'red',   desc:'MOI / NCEMA alert — "potential missile threats." Seek safe place in closest secure building; stay away from windows, doors and open areas.', src:'Time Out Dubai / Gulf News' },
+    { time:'~08:40',  type:'allclear', level:'green', desc:'All-clear — "situation is currently safe." UAE MOD: 9 missiles (8 intercepted, 1 fell to sea), 35 drones (26 intercepted, 9 fell). Ruwais refinery drone strike; ADNOC 922k bpd shutdown.', src:'Gulf News / UAE MOD' },
+  ]},
+
+  { day:'09mar', label:'09 Mar — Sunday (Day 9)', alerts:[
+    { time:'08:30*',  type:'missile',  level:'red',   desc:'NCEMA Alert 1 (Abu Dhabi) — shelter-in-place. Missiles and drones incoming despite President Pezeshkian\'s ceasefire claim. NCEMA also announces new quieter night-time alert tones effective from today.', src:'NCEMA @NCEMAUAE' },
+    { time:'~09:40',  type:'allclear', level:'green', desc:'All-clear 1 issued, Abu Dhabi.', src:'NCEMA' },
+    { time:'09:55*',  type:'missile',  level:'red',   desc:'NCEMA Alert 2 (Abu Dhabi) — second wave detected. Renewed shelter-in-place.', src:'NCEMA @NCEMAUAE' },
+    { time:'~10:30',  type:'allclear', level:'green', desc:'All-clear 2 issued, Abu Dhabi.', src:'NCEMA' },
+    { time:'10:55*',  type:'mixed',    level:'red',   desc:'NCEMA Alert 3 (Abu Dhabi + Dubai) — third wave. Both emirates ordered to shelter simultaneously.', src:'NCEMA @NCEMAUAE' },
+    { time:'~11:30',  type:'allclear', level:'green', desc:'All-clear 3. 1 drone fell inside UAE. UAE MOD: 15 missiles (12 intercepted, 3 fell to sea), 18 drones (17 intercepted).', src:'NCEMA / UAE MOD' },
+  ]},
+
+  { day:'08mar', label:'08 Mar — Saturday (Day 8)', alerts:[
+    { time:'08:32*',  type:'mixed',    level:'red',   desc:'NCEMA / MOD Alert 1 — "air defence systems responding to missile and drone threats from Iran." Sounds heard are from intercept activity. Posted on X at 08:32.', src:'ARN News Centre / NCEMA @NCEMAUAE' },
+    { time:'10:53*',  type:'mixed',    level:'red',   desc:'MOI Alert 2 — second wave. Citizens and residents advised to seek safe place in closest secure building and await further instructions.', src:'ARN News Centre' },
+    { time:'11:15*',  type:'allclear', level:'green', desc:'All-clear — "situation is currently safe, resume activities with caution." Al Barsha debris kills Pakistani motorist. Dubai Marina facade hit. 16 BM (15 intercepted, 1 to sea) + 117 drones (all intercepted).', src:'ARN News Centre / Dubai Media Office' },
+    { time:'—',       type:'info',     level:'blue',  desc:'UAE President MBZ visits wounded in hospital and declares UAE is in "a period of war."', src:'UAE Presidential Court' },
+  ]},
+
+  { day:'07mar', label:'07 Mar — Friday (Day 7)', alerts:[
+    { time:'~10:00',  type:'mixed',    level:'red',   desc:'MOI alert to Dubai residents — shelter, steer away from windows, doors and open areas. UAE MOD: 16 BM + 122 drones fired. All 16 BM intercepted; 117 of 122 drones intercepted, 5 fell inside UAE.', src:'Time Out Dubai / UAE MOD' },
+    { time:'~10:40',  type:'allclear', level:'green', desc:'All-clear ~40 minutes after alert. Al Barsha debris kills driver (Asian national). 23 Marina tower struck by direct drone hit. DXB briefly closed (~45 min) as object intercepted near airport. Abu Dhabi and Sharjah debris falls.', src:'Time Out Dubai / Dubai Media Office' },
+  ]},
+
+  { day:'06mar', label:'06 Mar — Thursday (Day 6)', alerts:[
+    { time:'~12:00',  type:'mixed',    level:'red',   desc:'MOI alert to Dubai residents at ~noon — shelter in closest secure building; steer away from windows, doors and open areas. UAE MOD: 9 missiles (all intercepted) + 55 drones (3 fell inside UAE). Abu Dhabi alert also issued separately (~19:15 from The National 5 Mar article context).', src:'Time Out Dubai / The National' },
+    { time:'~12:30',  type:'allclear', level:'green', desc:'All-clear shortly before 12:30. Lightest day of campaign by volume. Musaffah and Fujairah debris; no casualties.', src:'Time Out Dubai / NCEMA' },
+  ]},
+
+  { day:'05mar', label:'05 Mar — Wednesday (Day 5)', alerts:[
+    { time:'19:15*',  type:'mixed',    level:'red',   desc:'MOD Alert 1 — "UAE air defences responding to incoming missile and drone threats from Iran." Sounds heard are interception activity. Abu Dhabi alert.', src:'The National / UAE MOD @modgovae' },
+    { time:'~20:00',  type:'mixed',    level:'red',   desc:'NCEMA Alert 2 — Abu Dhabi, Dubai and Sharjah simultaneously. 7 BM (6 intercepted, 1 struck ICAD II — first BM impact on UAE soil). 131 drones (125 intercepted, 6 fell). 6 workers injured at ICAD II.', src:'The National / UAE MOD / NCEMA' },
+    { time:'~20:30',  type:'allclear', level:'green', desc:'All-clear. Sharjah warehouse fire. RAK and Abu Dhabi suburbs report debris. UAE MOD confirms 3 deaths + 94 injuries since 28 Feb.', src:'NCEMA / UAE MOD' },
+  ]},
+
+  { day:'04mar', label:'04 Mar — Tuesday (Day 4)', alerts:[
+    { time:'—',       type:'mixed',    level:'red',   desc:'NCEMA alert. UAE MOD: 3 BM (all intercepted) + 129 drones (8 fell inside UAE). Musaffah industrial zone debris. Schools remain on distance learning.', src:'UAE MOD / NCEMA' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. No casualties on 4 Mar. US Embassy issues updated shelter-in-place advisory.', src:'NCEMA / US Embassy UAE' },
+  ]},
+
+  { day:'03mar', label:'03 Mar — Monday (Day 3)', alerts:[
+    { time:'02:30*',  type:'mixed',    level:'red',   desc:'MOI alert issued to Dubai residents at 02:30 — "Air defence systems are currently responding to a missile threat. Please remain in a safe location." 12 missiles + 123 drones fired; 11 missiles intercepted, 1 struck; 110 drones intercepted, 13 reached UAE territory.', src:'Time Out Dubai / MOI @moiuae' },
+    { time:'~23:30',  type:'drone',    level:'amber', desc:'US Consulate Dubai (Al Wasl Road, Jumeirah) struck — drone hits adjacent parking lot. Secretary Rubio confirms all personnel safe.', src:'US State Dept / Al Jazeera' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. AUH brief disruption from nearby debris. Umm Al Quwain reports debris.', src:'NCEMA' },
+  ]},
+
+  { day:'02mar', label:'02 Mar — Sunday (Day 2)', alerts:[
+    { time:'—',       type:'mixed',    level:'red',   desc:'NCEMA alert. UAE MOD: 9 missiles (all intercepted) + 148 drones (9 fell inside UAE). Debris in Ajman industrial area and Abu Dhabi Corniche. MOHRE urges private sector remote working (1–3 Mar).', src:'UAE MOD / NCEMA / Gulf News' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. No casualties on 2 Mar. Cumulative UAE MOD total: 174 BM (161 intercepted, 13 to sea); 689 drones (645 intercepted); 8 cruise missiles (all intercepted).', src:'UAE MOD / NCEMA' },
+  ]},
+
+  { day:'01mar', label:'01 Mar — Saturday (Day 1 cont.)', alerts:[
+    { time:'~01:00',  type:'mixed',    level:'red',   desc:'MOI / NCEMA nationwide alert — "Potential missile threat. Seek immediate shelter. Stay away from windows, doors and open areas." Heaviest single day of campaign: 28 missiles + 332 drones launched. First-of-its-kind nationwide alert in UAE history.', src:'NCEMA / MOI @moiuae' },
+    { time:'morning', type:'drone',    level:'amber', desc:'AUH struck — Shahed drone kills Bangladeshi worker, injures 3. AUH suspended; UAE fully closed to commercial aviation (DXB already down since 28 Feb). 3rd fatality of campaign.', src:'Abu Dhabi Media Office' },
+    { time:'morning', type:'info',     level:'blue',  desc:'South Dubai: interception debris injures 2 residents (2 home courtyards). Jebel Ali Port: second berth fire. Nepalese national killed in Abu Dhabi suburbs (2nd fatality). Sharjah city reports debris.', src:'Dubai Media Office / Al Jazeera' },
+    { time:'—',       type:'allclear', level:'green', desc:'All-clear. UAE MOD confirms 14 drones reached territory. 3 deaths + 58 injuries confirmed since 28 Feb.', src:'NCEMA / UAE MOD' },
+  ]},
+
+  { day:'28feb', label:'28 Feb — Saturday (Day 1 — Campaign Begins)', alerts:[
+    { time:'~01:00',  type:'mixed',    level:'red',   desc:'FIRST ALERT OF THE CAMPAIGN — MOI issues emergency alert immediately following initial Iranian strike wave. First-ever nationwide missile shelter alert in UAE history. DXB Terminal 3 struck at ~01:30 (4 staff injured). Palm Jumeirah Fairmont drone explosion at ~01:30 (4 injured).', src:'MOI @moiuae / Dubai Media Office' },
+    { time:'~02:00',  type:'info',     level:'blue',  desc:'Burj Al Arab facade hit by interception debris (exterior fire, controlled). Jebel Ali Port first berth fire. Burj Khalifa vicinity smoke; Downtown Dubai locked down. AWS Data Centre (mec1-az2) struck — first confirmed commercial cloud infrastructure hit in a Gulf conflict.', src:'Dubai Civil Defence / AWS / Al Jazeera' },
+    { time:'~04:00',  type:'missile',  level:'red',   desc:'Abu Dhabi alert — Pakistani national killed by interception debris. FIRST FATALITY of the war. UAE MOD confirms 3 waves of Iranian missiles and drones intercepted overnight.', src:'Abu Dhabi Media Office / UAE MOD' },
+    { time:'morning', type:'allclear', level:'green', desc:'All-clear. UAE MOD: 137 BM + 209 drones + 2 cruise missiles launched on Day 1. 21 drones reached territory — single-day ground-strike record of the campaign. DXB and AUH suspended.', src:'UAE MOD / NCEMA' },
+    { time:'—',       type:'info',     level:'blue',  desc:'UAE schools shift to distance learning. MOI urges public to use 999 for emergencies only. NCEMA activates national readiness system. MOHRE urges private sector remote work from 1–3 Mar.', src:'UAE Government / NCEMA / MOHRE' },
+  ]},
+];
+
+// ── LIST VIEW TOGGLE ──
+let activeListView = 'alerts';
+
+function setListView(view) {
+  activeListView = view;
+  document.getElementById('alist').style.display       = view === 'incidents' ? '' : 'none';
+  document.getElementById('alert-feed').style.display  = view === 'alerts'    ? '' : 'none';
+  document.getElementById('lvt-inc').classList.toggle('active',    view === 'incidents');
+  document.getElementById('lvt-alerts').classList.toggle('active', view === 'alerts');
+  const tzHint = document.getElementById('tz-hint');
+  if (tzHint) tzHint.style.display = view === 'alerts' ? '' : 'none';
+  if (view === 'alerts') buildAlertFeed();
+}
+
+function buildAlertFeed() {
+  const el = document.getElementById('alert-feed');
+  const d = DAILY[activeDay] || DAILY.all;
+  // Filter to active day if not 'all'
+  const days = activeDay === 'all' ? ALERT_FEED : ALERT_FEED.filter(x => x.day === activeDay);
+
+  if (!days.length) {
+    el.innerHTML = '<div style="padding:20px 12px;font-size:11px;color:rgba(255,255,255,0.35);text-align:center;">No alert data for this day.</div>';
+    return;
+  }
+
+  el.innerHTML = days.map(dayObj => {
+    const dayStats = DAILY[dayObj.day];
+    const pills = dayStats ? [
+      dayStats.ml != null ? `<span class="af-pill m">🚀 ${dayStats.ml} missiles</span>` : '',
+      dayStats.dl != null ? `<span class="af-pill d">✈ ${dayStats.dl} drones</span>` : '',
+      (dayStats.ms != null && dayStats.ms > 0) ? `<span class="af-pill s">💥 ${dayStats.ms} struck</span>` : '',
+    ].filter(Boolean).join('') : '';
+
+    const alertsHtml = dayObj.alerts.map(a => `
+      <div class="af-alert ${a.level}">
+        <div class="af-time">${a.time}</div>
+        <div class="af-body">
+          <div class="af-type ${a.type}">${a.type === 'allclear' ? '✓ All Clear' : a.type === 'info' ? 'ℹ Info' : a.type.charAt(0).toUpperCase() + a.type.slice(1)}</div>
+          <div class="af-desc">${a.desc}</div>
+          <div class="af-src">${a.src}</div>
+        </div>
+      </div>`).join('');
+
+    return `<div class="af-day">
+      <div class="af-day-hdr">
+        <span class="af-day-label">${dayObj.label}</span>
+        <span class="af-day-count">${dayObj.alerts.length} alerts</span>
+      </div>
+      ${pills ? `<div class="af-day-pills">${pills}</div>` : ''}
+      ${alertsHtml}
+    </div>`;
+  }).join('');
+}
+
 </script>
 </body>
 </html>
