@@ -670,6 +670,7 @@ body.dark-map .pu-link:hover{background:rgba(96,165,250,0.2);}
 </div>
 
 <script>
+
 // ╔══════════════════════════════════════════════════════════════════╗
 // ║  CONFIGURATION — update here each day                          ║
 // ║  1. Add a new entry to DAYS array (key + label)               ║
@@ -707,15 +708,15 @@ const DAYS = [
 const DAILY = {
   // Cumulative through 13 Mar (partial — full breakdown pending UAE MOD end-of-day statement)
   // Through 10 Mar confirmed (Gulf News / UAE MOD): 262 ml, 241 mi, 19 sea, 2 landed; 1,475 dl
-  all:    { label:'All Days (28 Feb–17 Mar)*', ml:304, cm:15,   dl:1627, mi:304, di:1627, cm_i:15, ms:4, ds:115, inc:50, frozenRate:95, minOnly:true },
+  all:    { label:'All Days (28 Feb–17 Mar)*', ml:314, cm:15,   dl:1672, mi:314, di:1672, cm_i:15, ms:4, ds:119, inc:55, frozenRate:95, minOnly:true },
   '28feb':{ label:'28 Feb',  ml:137, dl:209,  mi:137, di:188,  ms:0,  ds:21, inc:8  },
-  '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:5  },
+  '01mar':{ label:'01 Mar',  ml:28,  dl:332,  mi:28,  di:318,  ms:0,  ds:14, inc:6  },
   '02mar':{ label:'02 Mar',  ml:9,   dl:148,  mi:9,   di:139,  ms:0,  ds:9,  inc:2  },
   '03mar':{ label:'03 Mar',  ml:12,  dl:123,  mi:11,  di:110,  ms:1,  ds:13, inc:3  },
   '04mar':{ label:'04 Mar',  ml:3,   dl:129,  mi:3,   di:121,  ms:0,  ds:8,  inc:1  },
   '05mar':{ label:'05 Mar',  ml:7,   dl:131,  mi:6,   di:125,  ms:1,  ds:6,  inc:4  },
   '06mar':{ label:'06 Mar',  ml:9,   dl:112,  mi:9,   di:109,  ms:0,  ds:3,  inc:2  },
-  '07mar':{ label:'07 Mar',  ml:16,  dl:121,  mi:15,  di:119,  ms:0,  ds:2,  inc:5  },
+  '07mar':{ label:'07 Mar',  ml:16,  dl:121,  mi:15,  di:119,  ms:0,  ds:2,  inc:6  },
   '08mar':{ label:'08 Mar',  ml:16,  dl:117,  mi:15,  di:117,  ms:0,  ds:2,  inc:3  },
   '09mar':{ label:'09 Mar',  ml:15,  dl:18,   mi:12,  di:17,   ms:0,  ds:1,  inc:2  },
   // 10 Mar confirmed: UAE MOD — 9 missiles (8 destroyed, 1 sea), 35 drones (26 intercepted, 9 fell) [Gulf News / WAM]
@@ -731,7 +732,7 @@ const DAILY = {
   '14mar':{ label:'14 Mar',  ml:9,    dl:33,   mi:9,    di:33,   ms:null, ds:0, inc:2, minOnly:true  },
   '15mar':{ label:'15 Mar',  ml:4,    dl:6,    mi:4,    di:6,    ms:null, ds:0, inc:0, minOnly:true  },
   '16mar':{ label:'16 Mar',  ml:6,    dl:21,   mi:6,    di:21,   ms:1,   ds:3, inc:4, minOnly:true  },
-  '17mar':{ label:'17 Mar*', ml:null, dl:null, mi:null, di:null, ms:null, ds:1, inc:2, minOnly:true  },
+  '17mar':{ label:'17 Mar*', ml:10,   dl:45,   mi:10,   di:45,   ms:null, ds:3, inc:5, minOnly:true  },
 };
 
 // ╔══════════════════════════════════════════════════════════════════╗
@@ -741,6 +742,43 @@ const DAILY = {
 // ╚══════════════════════════════════════════════════════════════════╝
 const INCIDENTS = [
   // ══ 17 MARCH (Tuesday) ═══════════════════════════════════════════
+  {
+    id:'UAQ17MAR_BUILDING', asset:'residential', day:'17mar', emirate:'Umm Al Quwain', sc:'r', type:'drone',
+    lat:25.5649, lon:55.5552,
+    name:'Umm Al Quwain — Drone Strikes Building, Fire',
+    area:'Umm Al Quwain City',
+    time:'Daytime GST · 17 Mar',
+    status:'STRUCK — fire, no casualties', strikes:1,
+    weapon:'Iranian drone (direct strike)',
+    cas:'None — no injuries or casualties', dmg:'A building in Umm Al Quwain was targeted by a drone, resulting in a fire. Specialised emergency teams responded immediately. No casualties or injuries were confirmed.',
+    rate:'—', mwave:null, mstruck:null, dwave:null, dstruck:1,
+    desc:'The Umm Al Quwain Government Media Office confirmed on 17 March that a building in the emirate was targeted by an Iranian drone, causing a fire. Specialised emergency teams responded immediately to the scene. Authorities confirmed there were no casualties or injuries. The government urged the public to remain calm and rely on official sources. Umm Al Quwain is one of the UAE\'s smaller northern emirates and had not previously been a primary target — this marked a notable geographic expansion of strikes into the northern emirates beyond Sharjah and Ras Al Khaimah.',
+    news:[
+      {dot:'r',text:'Umm Al Quwain Government Media Office: building targeted by drone, fire breaks out. Emergency teams respond. No casualties.',time:'17 Mar · Umm Al Quwain Government Media Office / Gulf News Day 17'},
+    ],
+    links:[
+      {label:'Gulf News Day 17 live blog', url:'https://gulfnews.com/uae/usisrael-war-with-iran-day-17-trump-urges-allies-to-secure-strait-of-hormuz-dubai-flights-suspended-1.500475750'},
+    ]
+  },
+  {
+    id:'FUJ17MAR_TANKER', asset:'port', day:'17mar', emirate:'Fujairah', sc:'r', type:'debris',
+    lat:25.2141, lon:56.5417,
+    name:'Tanker Struck 23nm East of Fujairah',
+    area:'Gulf of Oman (23nm E of Fujairah)',
+    time:'Afternoon GST · 17 Mar',
+    status:'STRUCK — minor structural damage, no injuries', strikes:1,
+    weapon:'Falling debris from aerial interception (probable)',
+    cas:'None — no injuries', dmg:'Minor structural damage to vessel. Investigations indicate damage likely caused by falling debris from interceptions in the area.',
+    rate:'—', mwave:null, mstruck:null, dwave:null, dstruck:1,
+    desc:'The UK Maritime Trade Operations (UKMTO) reported on 17 March that a projectile struck a tanker anchored approximately 23 nautical miles (42.6km) east of Fujairah in the UAE. No injuries were reported. The vessel\'s company security officer stated that investigations indicated the damage was likely caused by falling debris from aerial interceptions in the area rather than a direct strike. The incident caused minor structural damage. This was the first confirmed maritime incident directly involving a vessel near UAE waters during the campaign, reflecting the expanding geographic footprint of the strike campaign to include the Gulf of Oman approaches.',
+    news:[
+      {dot:'r',text:'UKMTO: projectile strikes tanker anchored 23nm east of Fujairah. No injuries. Minor structural damage. Likely debris from interception.',time:'17 Mar · UKMTO / Al Jazeera'},
+    ],
+    links:[
+      {label:'Al Jazeera — Drone sparks fire at UAE oil site', url:'https://www.aljazeera.com/news/2026/3/17/drone-sparks-fire-at-uae-oil-site-as-gulf-takes-more-hits-amid-iran-war'},
+    ]
+  },
+
   // UAE airspace fully closed then reopened (~2 hrs) — exceptional precautionary measure.
   // UAE MOD daily figures not yet published for 17 Mar.
   // Confirmed incidents: Fujairah FOIZ drone strike (fire, no injuries);
@@ -1256,6 +1294,25 @@ const INCIDENTS = [
     ]
   },
   {
+    id:'AD07MAR_ALDHAFRA', asset:'military', day:'07mar', emirate:'Abu Dhabi', sc:'r', type:'mixed',
+    lat:24.2481, lon:54.5478,
+    name:'Al Dhafra Air Base — Targeted by Drones and Missiles',
+    area:'Al Dhafra, Abu Dhabi (~32km S of city)',
+    time:'Morning GST · 7 Mar',
+    status:'STRUCK — outcome details restricted', strikes:1,
+    weapon:'Iranian drone and missile (mixed wave)',
+    cas:'Outcome not fully disclosed', dmg:'Al Dhafra Air Base targeted by Iranian drones and missiles. Hosts ~3,500 US troops (380th Air Expeditionary Wing) and French forces. UAE, US and French air defence systems engaged the threats.',
+    rate:'—', mwave:16, mstruck:0, dwave:121, dstruck:5,
+    desc:'Al Dhafra Air Base, located approximately 32km south of Abu Dhabi city, was targeted by Iranian drones and missile strikes on 7 March — the same wave in which 23 Marina tower was struck and an Al Barsha motorist killed. The base is one of the most significant US military installations in the region, hosting approximately 3,500 US troops as part of the 380th Air Expeditionary Wing, alongside French forces. It serves as a key hub for air operations, intelligence gathering and drone operations over the Gulf. The UAE, US and French air defence systems were actively engaged. Full damage assessment details remain restricted under operational security. CNBC confirmed the base was targeted on 7 March.',
+    news:[
+      {dot:'r',text:'Al Dhafra Air Base targeted by Iranian drones and missiles on 7 March wave. Home to ~3,500 US troops (380th AEW) and French forces.',time:'7 Mar · CNBC / Reuters'},
+      {dot:'b',text:'US Embassy Abu Dhabi issues morning and evening shelter-in-place advisories. France and US air defence units actively engaged.',time:'7 Mar · US Embassy UAE'},
+    ],
+    links:[
+      {label:'CNBC — Why UAE is a target for Iran', url:'https://www.cnbc.com/2026/03/15/iran-us-war-uae-target-aggression.html'},
+    ]
+  },
+  {
     id:'AD7MAR', asset:'residential', name:'Abu Dhabi — Debris Falls', area:'Abu Dhabi City', emirate:'Abu Dhabi',
     lat:24.4539, lon:54.3773, type:'debris', day:'07mar', time:'~07:00 GST',
     status:'DEBRIS', sc:'p', strikes:1,
@@ -1485,6 +1542,24 @@ const INCIDENTS = [
 
   // ══ 01 MARCH ═══════════════════════════════════════════════════
   {
+    id:'AD01MAR_ETIHADTOWERS', asset:'residential', day:'01mar', emirate:'Abu Dhabi', sc:'r', type:'debris',
+    lat:24.4617, lon:54.3163,
+    name:'Etihad Towers — Debris Injures Woman and Child',
+    area:'Corniche, Abu Dhabi',
+    time:'Morning GST · 1 Mar',
+    status:'Debris impact — 2 injured', strikes:1,
+    weapon:'Interception debris (from intercepted Iranian drone)',
+    cas:'2 injured: woman and child (minor)', dmg:'Debris from an intercepted Iranian drone fell on the Etihad Towers complex on the Abu Dhabi Corniche, injuring a woman and her child. One of the towers sustained visible damage. The complex comprises five towers including a hotel, residences and office space.',
+    rate:'—', mwave:28, mstruck:0, dwave:332, dstruck:14,
+    desc:'During the 1 March attack wave — the heaviest single day of the campaign — debris from an intercepted Iranian drone fell on the Etihad Towers complex, one of Abu Dhabi\'s most recognisable landmarks on the Corniche waterfront. A woman and her child sustained minor injuries. One of the buildings was damaged. The incident was confirmed by WAM (state news agency). The attack wave on 1 March involved 332 drones and 28 missiles — the highest single-day total of the campaign.',
+    news:[
+      {dot:'r',text:'Debris from intercepted drone falls on Etihad Towers, Abu Dhabi Corniche. Woman and child sustain minor injuries.',time:'1 Mar · WAM / The National'},
+    ],
+    links:[
+      {label:'The National — Etihad Towers debris injures woman and child', url:'https://www.thenationalnews.com/news/uae/2026/03/01/iran-missile-attacks-uae-deaths/'},
+    ]
+  },
+  {
     id:'AUH1', asset:'airport', name:'Abu Dhabi Airport — Drone Strike', area:'Abu Dhabi International Airport', emirate:'Abu Dhabi',
     lat:24.4330, lon:54.6511, type:'drone', day:'01mar', time:'~05:30 GST',
     status:'STRUCK', sc:'r', strikes:2,
@@ -1668,6 +1743,25 @@ const INCIDENTS = [
       {label:'Dubai Airports statement', url:'https://www.dubaiairports.ae/corporate/media-centre/press-releases'},
       {label:'Emirates: flight suspension', url:'https://www.emirates.com/english/help/travel-updates/'},
       {label:'Reuters: DXB strike', url:'https://www.reuters.com/world/middle-east/iran-uae-conflict'},
+    ]
+  },
+  {
+    id:'AD28FEB_CAMPDELAPAIX', asset:'military', day:'28feb', emirate:'Abu Dhabi', sc:'r', type:'drone',
+    lat:24.4285, lon:54.3773,
+    name:'Camp de la Paix — French Naval Base Struck',
+    area:'Zayed Port area, Abu Dhabi',
+    time:'Night GST · 28 Feb',
+    status:'STRUCK — no casualties reported', strikes:1,
+    weapon:'Iranian drones (Shahed-type)',
+    cas:'None confirmed', dmg:'French naval air base Camp de la Paix, located near Zayed Port in Abu Dhabi, was struck by Iranian drones on the opening night of the campaign. France subsequently deployed Rafale jets to the UAE to reinforce defences.',
+    rate:'—', mwave:137, mstruck:0, dwave:209, dstruck:21,
+    desc:'Camp de la Paix (French: "Camp of Peace"), a French naval air base located adjacent to Zayed Port in Abu Dhabi, was struck by Iranian drones during the opening wave of the campaign on 28 February. The base hosts French naval aviation assets and personnel. France deployed Rafale fighter jets to the UAE following the attack to provide additional defensive air cover. The base is distinct from Al Dhafra Air Base (used by the US and France for air operations), being a naval facility. No casualties were reported.',
+    news:[
+      {dot:'r',text:'French naval air base Camp de la Paix near Zayed Port struck by Iranian drones on opening night.',time:'28 Feb · AFP / The National'},
+      {dot:'b',text:'France deploys Rafale jets to UAE following Camp de la Paix attack to reinforce air defences.',time:'2 Mar · Le Monde / Reuters'},
+    ],
+    links:[
+      {label:'The National — France deploys Rafales to UAE', url:'https://www.thenationalnews.com/news/uae/2026/03/02/france-deploys-rafale-jets-to-uae/'},
     ]
   },
   {
@@ -1974,17 +2068,7 @@ function manualRefresh(){ doRefresh(); startTimer(); }
 buildDateBar();
 buildMarkers();
 buildList();
-buildAlertFeed();
-updateStats();
-tick();
-startTimer();
-setInterval(tick,1000);
-// Fit to all UAE
-map.fitBounds([[22.6, 51.5],[26.1, 56.4]], {padding:[22,22]});
-</script>
 
-
-<script>
 // ══ ALERT FEED DATA ══
 // Source: NCEMA (UAE National Crisis and Emergency Management Authority),
 // UAE MOD statements, Al Jazeera live blogs, Gulf News, The National
@@ -2002,10 +2086,13 @@ const ALERT_FEED = [
   // ══════════════════════════════════════════════════════════════════
 
   { day:'17mar', label:'17 Mar — Tuesday (Day 17)', alerts:[
-    { time:'~02:00',  type:'missile',  level:'red',   desc:'NCEMA / MOI alert — missile and drone threat incoming over Abu Dhabi and Fujairah. Air defence systems responding.', src:'NCEMA / MOI' },
-    { time:'~02:30',  type:'allclear', level:'green', desc:'All-clear issued. Interceptions confirmed. Shrapnel from intercepted BM falls in Baniyas, Abu Dhabi — 1 Pakistani national killed (8th fatality of campaign).', src:'Abu Dhabi Media Office' },
-    { time:'~05:30',  type:'drone',    level:'amber', desc:'Fujairah alert — drone strike on Fujairah Oil Industry Zone (FOIZ). Fire breaks out; Civil Defence deployed. No injuries.', src:'Fujairah Media Office / WAM' },
-    { time:'~06:00',  type:'allclear', level:'green', desc:'All-clear issued, Fujairah. UAE MOD end-of-day statement for 17 Mar pending at time of last update.', src:'NCEMA' },
+    { time:'~02:00',  type:'missile',  level:'red',   desc:'NCEMA / MOI alert — missile and drone threat. Entire UAE airspace briefly closed (Euronews confirmed). Abu Dhabi MOD: "responding to missile and drone threats from Iran."', src:'UAE MOD / NCEMA / Euronews' },
+    { time:'~02:30',  type:'allclear', level:'green', desc:'All-clear. Airspace reopens — "situation stabilised" (UAE GCAA). Interception shrapnel falls in Baniyas, Abu Dhabi — 1 Pakistani national killed (8th fatality).', src:'UAE GCAA / Abu Dhabi Media Office' },
+    { time:'daytime', type:'drone',    level:'amber', desc:'Umm Al Quwain alert — drone strikes building in UmQ city. Fire breaks out; emergency teams respond immediately. No casualties. First confirmed strike on Umm Al Quwain.', src:'Umm Al Quwain Government Media Office' },
+    { time:'~05:30',  type:'drone',    level:'amber', desc:'Fujairah alert — drone strikes Fujairah Oil Industry Zone (FOIZ) for 2nd time this week. Fire; Civil Defence deployed. No injuries. FOIZ holds ~70m barrels, UAE\'s only Hormuz-bypass export route.', src:'Fujairah Media Office / WAM' },
+    { time:'~06:00',  type:'allclear', level:'green', desc:'All-clear issued, Fujairah.', src:'NCEMA' },
+    { time:'afternoon',type:'info',    level:'blue',  desc:'UKMTO: projectile strikes tanker anchored 23nm east of Fujairah in Gulf of Oman. Minor structural damage; no injuries. Vessel\'s security officer says likely interception debris.', src:'UKMTO / Al Jazeera' },
+    { time:'—',       type:'info',     level:'blue',  desc:'UAE MOD confirms 10 BM + 45 drones dealt with on 17 Mar (all intercepted). Running total: 314 BM + 15 CM + 1,672 drones intercepted since 28 Feb.', src:'UAE MOD' },
   ]},
 
   { day:'16mar', label:'16 Mar — Monday (Day 16)', alerts:[
@@ -2072,8 +2159,8 @@ const ALERT_FEED = [
   ]},
 
   { day:'07mar', label:'07 Mar — Friday (Day 7)', alerts:[
-    { time:'~10:00',  type:'mixed',    level:'red',   desc:'MOI alert to Dubai residents — shelter, steer away from windows, doors and open areas. UAE MOD: 16 BM + 122 drones fired. All 16 BM intercepted; 117 of 122 drones intercepted, 5 fell inside UAE.', src:'Time Out Dubai / UAE MOD' },
-    { time:'~10:40',  type:'allclear', level:'green', desc:'All-clear ~40 minutes after alert. Al Barsha debris kills driver (Asian national). 23 Marina tower struck by direct drone hit. DXB briefly closed (~45 min) as object intercepted near airport. Abu Dhabi and Sharjah debris falls.', src:'Time Out Dubai / Dubai Media Office' },
+    { time:'~10:00',  type:'mixed',    level:'red',   desc:'MOI alert to Dubai residents — shelter, steer away from windows, doors and open areas. UAE MOD: 16 BM + 122 drones fired. All 16 BM intercepted; 117 of 122 drones intercepted, 5 fell inside UAE. Al Dhafra Air Base (~32km S of Abu Dhabi) targeted — hosts ~3,500 US troops (380th AEW) and French forces.', src:'Time Out Dubai / UAE MOD / CNBC' },
+    { time:'~10:40',  type:'allclear', level:'green', desc:'All-clear ~40 minutes after alert. Al Barsha debris kills driver (Asian national). 23 Marina tower struck by direct drone hit. DXB briefly closed (~45 min). Abu Dhabi and Sharjah debris falls.', src:'Time Out Dubai / Dubai Media Office' },
   ]},
 
   { day:'06mar', label:'06 Mar — Thursday (Day 6)', alerts:[
@@ -2106,13 +2193,13 @@ const ALERT_FEED = [
   { day:'01mar', label:'01 Mar — Saturday (Day 1 cont.)', alerts:[
     { time:'~01:00',  type:'mixed',    level:'red',   desc:'MOI / NCEMA nationwide alert — "Potential missile threat. Seek immediate shelter. Stay away from windows, doors and open areas." Heaviest single day of campaign: 28 missiles + 332 drones launched. First-of-its-kind nationwide alert in UAE history.', src:'NCEMA / MOI @moiuae' },
     { time:'morning', type:'drone',    level:'amber', desc:'AUH struck — Shahed drone kills Bangladeshi worker, injures 3. AUH suspended; UAE fully closed to commercial aviation (DXB already down since 28 Feb). 3rd fatality of campaign.', src:'Abu Dhabi Media Office' },
-    { time:'morning', type:'info',     level:'blue',  desc:'South Dubai: interception debris injures 2 residents (2 home courtyards). Jebel Ali Port: second berth fire. Nepalese national killed in Abu Dhabi suburbs (2nd fatality). Sharjah city reports debris.', src:'Dubai Media Office / Al Jazeera' },
+    { time:'morning', type:'info',     level:'blue',  desc:'South Dubai: interception debris injures 2 residents (2 home courtyards). Jebel Ali Port: second berth fire. Nepalese national killed in Abu Dhabi suburbs (2nd fatality). Etihad Towers (Abu Dhabi Corniche): interception debris injures woman and child. Sharjah city reports debris.', src:'Dubai Media Office / WAM / Al Jazeera' },
     { time:'—',       type:'allclear', level:'green', desc:'All-clear. UAE MOD confirms 14 drones reached territory. 3 deaths + 58 injuries confirmed since 28 Feb.', src:'NCEMA / UAE MOD' },
   ]},
 
   { day:'28feb', label:'28 Feb — Saturday (Day 1 — Campaign Begins)', alerts:[
     { time:'~01:00',  type:'mixed',    level:'red',   desc:'FIRST ALERT OF THE CAMPAIGN — MOI issues emergency alert immediately following initial Iranian strike wave. First-ever nationwide missile shelter alert in UAE history. DXB Terminal 3 struck at ~01:30 (4 staff injured). Palm Jumeirah Fairmont drone explosion at ~01:30 (4 injured).', src:'MOI @moiuae / Dubai Media Office' },
-    { time:'~02:00',  type:'info',     level:'blue',  desc:'Burj Al Arab facade hit by interception debris (exterior fire, controlled). Jebel Ali Port first berth fire. Burj Khalifa vicinity smoke; Downtown Dubai locked down. AWS Data Centre (mec1-az2) struck — first confirmed commercial cloud infrastructure hit in a Gulf conflict.', src:'Dubai Civil Defence / AWS / Al Jazeera' },
+    { time:'~02:00',  type:'info',     level:'blue',  desc:'Burj Al Arab facade hit by interception debris (exterior fire, controlled). Jebel Ali Port first berth fire. Burj Khalifa vicinity smoke; Downtown Dubai locked down. AWS Data Centre (mec1-az2) struck at ~16:30 GST — first confirmed commercial cloud infrastructure hit in a Gulf conflict. French naval base Camp de la Paix (Zayed Port, Abu Dhabi) struck by drones — France subsequently deploys Rafale jets.', src:'Dubai Civil Defence / AWS / Al Jazeera / AFP' },
     { time:'~04:00',  type:'missile',  level:'red',   desc:'Abu Dhabi alert — Pakistani national killed by interception debris. FIRST FATALITY of the war. UAE MOD confirms 3 waves of Iranian missiles and drones intercepted overnight.', src:'Abu Dhabi Media Office / UAE MOD' },
     { time:'morning', type:'allclear', level:'green', desc:'All-clear. UAE MOD: 137 BM + 209 drones + 2 cruise missiles launched on Day 1. 21 drones reached territory — single-day ground-strike record of the campaign. DXB and AUH suspended.', src:'UAE MOD / NCEMA' },
     { time:'—',       type:'info',     level:'blue',  desc:'UAE schools shift to distance learning. MOI urges public to use 999 for emergencies only. NCEMA activates national readiness system. MOHRE urges private sector remote work from 1–3 Mar.', src:'UAE Government / NCEMA / MOHRE' },
@@ -2172,6 +2259,17 @@ function buildAlertFeed() {
     </div>`;
   }).join('');
 }
+
+buildDateBar();
+buildMarkers();
+buildList();
+buildAlertFeed();
+updateStats();
+tick();
+startTimer();
+setInterval(tick,1000);
+// Fit to all UAE
+map.fitBounds([[22.6, 51.5],[26.1, 56.4]], {padding:[22,22]});
 
 </script>
 </body>
